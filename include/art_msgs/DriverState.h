@@ -24,22 +24,24 @@ struct DriverState_
   typedef DriverState_<ContainerAllocator> Type;
 
   DriverState_()
-    : state(0)  {
-    }
+    : state(0)
+  {
+  }
   DriverState_(const ContainerAllocator& _alloc)
-    : state(0)  {
-    }
+    : state(0)
+  {
+  }
 
 
 
-   typedef uint32_t _state_type;
+  typedef uint32_t _state_type;
   _state_type state;
 
 
-    enum { CLOSED = 0u };
-     enum { OPENED = 1u };
-     enum { RUNNING = 2u };
- 
+  enum { CLOSED = 0u };
+  enum { OPENED = 1u };
+  enum { RUNNING = 2u };
+
 
   typedef boost::shared_ptr< ::art_msgs::DriverState_<ContainerAllocator> > Ptr;
   typedef boost::shared_ptr< ::art_msgs::DriverState_<ContainerAllocator> const> ConstPtr;
@@ -53,19 +55,19 @@ typedef boost::shared_ptr< ::art_msgs::DriverState const> DriverStateConstPtr;
 
 // constants requiring out of line definition
 
-   
 
-   
 
-   
+
+
+
 
 
 
 template<typename ContainerAllocator>
 std::ostream& operator<<(std::ostream& s, const ::art_msgs::DriverState_<ContainerAllocator> & v)
 {
-ros::message_operations::Printer< ::art_msgs::DriverState_<ContainerAllocator> >::stream(s, "", v);
-return s;
+  ros::message_operations::Printer< ::art_msgs::DriverState_<ContainerAllocator> >::stream(s, "", v);
+  return s;
 }
 
 } // namespace art_msgs
@@ -87,33 +89,33 @@ namespace message_traits
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::DriverState_<ContainerAllocator> >
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::DriverState_<ContainerAllocator> const>
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::DriverState_<ContainerAllocator> >
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::DriverState_<ContainerAllocator> const>
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::DriverState_<ContainerAllocator> >
-  : FalseType
-  { };
+    : FalseType
+{ };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::DriverState_<ContainerAllocator> const>
-  : FalseType
-  { };
+    : FalseType
+{ };
 
 
 template<class ContainerAllocator>
@@ -124,7 +126,10 @@ struct MD5Sum< ::art_msgs::DriverState_<ContainerAllocator> >
     return "92d8e6361001072f038b293728a430f0";
   }
 
-  static const char* value(const ::art_msgs::DriverState_<ContainerAllocator>&) { return value(); }
+  static const char* value(const ::art_msgs::DriverState_<ContainerAllocator>&)
+  {
+    return value();
+  }
   static const uint64_t static_value1 = 0x92d8e6361001072fULL;
   static const uint64_t static_value2 = 0x038b293728a430f0ULL;
 };
@@ -137,7 +142,10 @@ struct DataType< ::art_msgs::DriverState_<ContainerAllocator> >
     return "art_msgs/DriverState";
   }
 
-  static const char* value(const ::art_msgs::DriverState_<ContainerAllocator>&) { return value(); }
+  static const char* value(const ::art_msgs::DriverState_<ContainerAllocator>&)
+  {
+    return value();
+  }
 };
 
 template<class ContainerAllocator>
@@ -158,7 +166,10 @@ uint32 state\n\
 ";
   }
 
-  static const char* value(const ::art_msgs::DriverState_<ContainerAllocator>&) { return value(); }
+  static const char* value(const ::art_msgs::DriverState_<ContainerAllocator>&)
+  {
+    return value();
+  }
 };
 
 } // namespace message_traits
@@ -169,15 +180,15 @@ namespace ros
 namespace serialization
 {
 
-  template<class ContainerAllocator> struct Serializer< ::art_msgs::DriverState_<ContainerAllocator> >
+template<class ContainerAllocator> struct Serializer< ::art_msgs::DriverState_<ContainerAllocator> >
+{
+  template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
   {
-    template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
-    {
-      stream.next(m.state);
-    }
+    stream.next(m.state);
+  }
 
-    ROS_DECLARE_ALLINONE_SERIALIZER;
-  }; // struct DriverState_
+  ROS_DECLARE_ALLINONE_SERIALIZER;
+}; // struct DriverState_
 
 } // namespace serialization
 } // namespace ros

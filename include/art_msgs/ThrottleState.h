@@ -31,8 +31,9 @@ struct ThrottleState_
     , estop(0)
     , pwm(0.0)
     , dstate(0.0)
-    , istate(0.0)  {
-    }
+    , istate(0.0)
+  {
+  }
   ThrottleState_(const ContainerAllocator& _alloc)
     : header(_alloc)
     , position(0.0)
@@ -40,30 +41,31 @@ struct ThrottleState_
     , estop(0)
     , pwm(0.0)
     , dstate(0.0)
-    , istate(0.0)  {
-    }
+    , istate(0.0)
+  {
+  }
 
 
 
-   typedef  ::std_msgs::Header_<ContainerAllocator>  _header_type;
+  typedef  ::std_msgs::Header_<ContainerAllocator>  _header_type;
   _header_type header;
 
-   typedef float _position_type;
+  typedef float _position_type;
   _position_type position;
 
-   typedef float _rpms_type;
+  typedef float _rpms_type;
   _rpms_type rpms;
 
-   typedef uint8_t _estop_type;
+  typedef uint8_t _estop_type;
   _estop_type estop;
 
-   typedef float _pwm_type;
+  typedef float _pwm_type;
   _pwm_type pwm;
 
-   typedef float _dstate_type;
+  typedef float _dstate_type;
   _dstate_type dstate;
 
-   typedef float _istate_type;
+  typedef float _istate_type;
   _istate_type istate;
 
 
@@ -86,8 +88,8 @@ typedef boost::shared_ptr< ::art_msgs::ThrottleState const> ThrottleStateConstPt
 template<typename ContainerAllocator>
 std::ostream& operator<<(std::ostream& s, const ::art_msgs::ThrottleState_<ContainerAllocator> & v)
 {
-ros::message_operations::Printer< ::art_msgs::ThrottleState_<ContainerAllocator> >::stream(s, "", v);
-return s;
+  ros::message_operations::Printer< ::art_msgs::ThrottleState_<ContainerAllocator> >::stream(s, "", v);
+  return s;
 }
 
 } // namespace art_msgs
@@ -109,33 +111,33 @@ namespace message_traits
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::ThrottleState_<ContainerAllocator> >
-  : FalseType
-  { };
+    : FalseType
+{ };
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::ThrottleState_<ContainerAllocator> const>
-  : FalseType
-  { };
+    : FalseType
+{ };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::ThrottleState_<ContainerAllocator> >
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::ThrottleState_<ContainerAllocator> const>
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::ThrottleState_<ContainerAllocator> >
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::ThrottleState_<ContainerAllocator> const>
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 
 template<class ContainerAllocator>
@@ -146,7 +148,10 @@ struct MD5Sum< ::art_msgs::ThrottleState_<ContainerAllocator> >
     return "5b1c64434e6ebe49625631607b188cd5";
   }
 
-  static const char* value(const ::art_msgs::ThrottleState_<ContainerAllocator>&) { return value(); }
+  static const char* value(const ::art_msgs::ThrottleState_<ContainerAllocator>&)
+  {
+    return value();
+  }
   static const uint64_t static_value1 = 0x5b1c64434e6ebe49ULL;
   static const uint64_t static_value2 = 0x625631607b188cd5ULL;
 };
@@ -159,7 +164,10 @@ struct DataType< ::art_msgs::ThrottleState_<ContainerAllocator> >
     return "art_msgs/ThrottleState";
   }
 
-  static const char* value(const ::art_msgs::ThrottleState_<ContainerAllocator>&) { return value(); }
+  static const char* value(const ::art_msgs::ThrottleState_<ContainerAllocator>&)
+  {
+    return value();
+  }
 };
 
 template<class ContainerAllocator>
@@ -202,7 +210,10 @@ string frame_id\n\
 ";
   }
 
-  static const char* value(const ::art_msgs::ThrottleState_<ContainerAllocator>&) { return value(); }
+  static const char* value(const ::art_msgs::ThrottleState_<ContainerAllocator>&)
+  {
+    return value();
+  }
 };
 
 } // namespace message_traits
@@ -213,21 +224,21 @@ namespace ros
 namespace serialization
 {
 
-  template<class ContainerAllocator> struct Serializer< ::art_msgs::ThrottleState_<ContainerAllocator> >
+template<class ContainerAllocator> struct Serializer< ::art_msgs::ThrottleState_<ContainerAllocator> >
+{
+  template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
   {
-    template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
-    {
-      stream.next(m.header);
-      stream.next(m.position);
-      stream.next(m.rpms);
-      stream.next(m.estop);
-      stream.next(m.pwm);
-      stream.next(m.dstate);
-      stream.next(m.istate);
-    }
+    stream.next(m.header);
+    stream.next(m.position);
+    stream.next(m.rpms);
+    stream.next(m.estop);
+    stream.next(m.pwm);
+    stream.next(m.dstate);
+    stream.next(m.istate);
+  }
 
-    ROS_DECLARE_ALLINONE_SERIALIZER;
-  }; // struct ThrottleState_
+  ROS_DECLARE_ALLINONE_SERIALIZER;
+}; // struct ThrottleState_
 
 } // namespace serialization
 } // namespace ros

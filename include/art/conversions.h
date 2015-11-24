@@ -2,7 +2,7 @@
  *
  *  Units conversion aids.
  *
- *  Copyright (C) 2007, 2009 Austin Robot Technology                    
+ *  Copyright (C) 2007, 2009 Austin Robot Technology
  *  License: Modified BSD Software License Agreement
  *
  *  $Id: 8b85d8eee695030560adbf478dadcedbd5d9287a $
@@ -12,7 +12,7 @@
 #define _CONVERSIONS_H
 
 /**  @file
-   
+
      @brief Units conversion constants and functions.
 
      @todo use art_msgs/Conversions definitions for multi-language support
@@ -28,14 +28,14 @@ const double INCHES_PER_FOOT = 12.0;
 const double CM_PER_INCH = 2.54;
 const double CM_PER_METER = 100.0;
 const double METERS_PER_FOOT = INCHES_PER_FOOT * CM_PER_INCH / CM_PER_METER; // = 0.3048
-const double MMETERS_PER_KM =	1000000.0;
-const double MMETERS_PER_MILE =	1609344.0;
-const double METERS_PER_MILE =	MMETERS_PER_MILE / 1000.0;
+const double MMETERS_PER_KM = 1000000.0;
+const double MMETERS_PER_MILE = 1609344.0;
+const double METERS_PER_MILE =  MMETERS_PER_MILE / 1000.0;
 const long   SECONDS_PER_MINUTE = 60;
-const long   MINUTES_PER_HOUR =	60;
-const long   SECONDS_PER_HOUR =	SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
-const double RADIANS_PER_DEGREE = M_PI/180.0;
-const double DEGREES_PER_RADIAN = 180.0/M_PI;
+const long   MINUTES_PER_HOUR = 60;
+const long   SECONDS_PER_HOUR = SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
+const double RADIANS_PER_DEGREE = M_PI / 180.0;
+const double DEGREES_PER_RADIAN = 180.0 / M_PI;
 
 /** Useful constants **/
 const double TWOPI = 2.0 * M_PI;
@@ -92,7 +92,7 @@ static inline double tv2secs(struct timeval *tv)
 static inline double analog_volts(int data, double maxvolts, int nbits)
 {
   // clamp value to specified bit range
-  int limit = (1<<nbits);
+  int limit = (1 << nbits);
   data &= (limit - 1);
   return (maxvolts * data) / limit;
 }
@@ -101,7 +101,7 @@ static inline double analog_volts(int data, double maxvolts, int nbits)
 static inline int analog_to_digital(double voltage,
                                     double maxvolts, int nbits)
 {
-  return (int) rintf((voltage / maxvolts) * (1<<nbits));
+  return (int) rintf((voltage / maxvolts) * (1 << nbits));
 }
 
 #endif // _CONVERSIONS_H

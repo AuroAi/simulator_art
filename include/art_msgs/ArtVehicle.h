@@ -24,89 +24,89 @@ struct ArtVehicle_
   typedef ArtVehicle_<ContainerAllocator> Type;
 
   ArtVehicle_()
-    {
-    }
+  {
+  }
   ArtVehicle_(const ContainerAllocator& _alloc)
-    {
-    }
+  {
+  }
 
 
 
 
-    static const std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other >  frame_id;
-     static const float length;
-     static const float width;
-     static const float height;
-     static const float halflength;
-     static const float halfwidth;
-     static const float halfheight;
-     static const float wheelbase;
-     static const float lane_width;
-     static const float turning_radius;
-     static const float weight_curb;
-     static const float weight_max_payload;
-     static const float weight_gross;
-     static const float weight;
-     static const float max_accel;
-     static const float max_decl;
-     static const float max_speed;
-     static const float front_bumper_px;
-     static const float rear_bumper_px;
-     static const float front_left_wheel_px;
-     static const float front_left_wheel_py;
-     static const float front_right_wheel_px;
-     static const float front_right_wheel_py;
-     static const float rear_left_wheel_px;
-     static const float rear_left_wheel_py;
-     static const float rear_right_wheel_px;
-     static const float rear_right_wheel_py;
-     static const float geom_px;
-     static const float geom_py;
-     static const float geom_pa;
-     static const float velodyne_px;
-     static const float velodyne_py;
-     static const float velodyne_pz;
-     static const float velodyne_yaw;
-     static const float velodyne_pitch;
-     static const float velodyne_roll;
-     static const float front_SICK_px;
-     static const float front_SICK_py;
-     static const float front_SICK_pz;
-     static const float front_SICK_roll;
-     static const float front_SICK_pitch;
-     static const float front_SICK_yaw;
-     static const float rear_SICK_px;
-     static const float rear_SICK_py;
-     static const float rear_SICK_pz;
-     static const float rear_SICK_roll;
-     static const float rear_SICK_pitch;
-     static const float rear_SICK_yaw;
-     static const float center_front_camera_px;
-     static const float center_front_camera_py;
-     static const float center_front_camera_pz;
-     static const float center_front_camera_yaw;
-     static const float center_front_camera_pitch;
-     static const float center_front_camera_roll;
-     static const float right_front_camera_px;
-     static const float right_front_camera_py;
-     static const float right_front_camera_pz;
-     static const float right_front_camera_yaw;
-     static const float right_front_camera_pitch;
-     static const float right_front_camera_roll;
-     static const float left_front_camera_px;
-     static const float left_front_camera_py;
-     static const float left_front_camera_pz;
-     static const float left_front_camera_yaw;
-     static const float left_front_camera_pitch;
-     static const float left_front_camera_roll;
-     static const float max_steer_degrees;
-     static const float max_steer_radians;
-     static const float turn_radius;
-     static const float front_outer_wheel_turn_radius;
-     static const float front_inner_wheel_turn_radius;
-     static const float rear_outer_wheel_turn_radius;
-     static const float rear_inner_wheel_turn_radius;
- 
+  static const std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other >  frame_id;
+  static const float length;
+  static const float width;
+  static const float height;
+  static const float halflength;
+  static const float halfwidth;
+  static const float halfheight;
+  static const float wheelbase;
+  static const float lane_width;
+  static const float turning_radius;
+  static const float weight_curb;
+  static const float weight_max_payload;
+  static const float weight_gross;
+  static const float weight;
+  static const float max_accel;
+  static const float max_decl;
+  static const float max_speed;
+  static const float front_bumper_px;
+  static const float rear_bumper_px;
+  static const float front_left_wheel_px;
+  static const float front_left_wheel_py;
+  static const float front_right_wheel_px;
+  static const float front_right_wheel_py;
+  static const float rear_left_wheel_px;
+  static const float rear_left_wheel_py;
+  static const float rear_right_wheel_px;
+  static const float rear_right_wheel_py;
+  static const float geom_px;
+  static const float geom_py;
+  static const float geom_pa;
+  static const float velodyne_px;
+  static const float velodyne_py;
+  static const float velodyne_pz;
+  static const float velodyne_yaw;
+  static const float velodyne_pitch;
+  static const float velodyne_roll;
+  static const float front_SICK_px;
+  static const float front_SICK_py;
+  static const float front_SICK_pz;
+  static const float front_SICK_roll;
+  static const float front_SICK_pitch;
+  static const float front_SICK_yaw;
+  static const float rear_SICK_px;
+  static const float rear_SICK_py;
+  static const float rear_SICK_pz;
+  static const float rear_SICK_roll;
+  static const float rear_SICK_pitch;
+  static const float rear_SICK_yaw;
+  static const float center_front_camera_px;
+  static const float center_front_camera_py;
+  static const float center_front_camera_pz;
+  static const float center_front_camera_yaw;
+  static const float center_front_camera_pitch;
+  static const float center_front_camera_roll;
+  static const float right_front_camera_px;
+  static const float right_front_camera_py;
+  static const float right_front_camera_pz;
+  static const float right_front_camera_yaw;
+  static const float right_front_camera_pitch;
+  static const float right_front_camera_roll;
+  static const float left_front_camera_px;
+  static const float left_front_camera_py;
+  static const float left_front_camera_pz;
+  static const float left_front_camera_yaw;
+  static const float left_front_camera_pitch;
+  static const float left_front_camera_roll;
+  static const float max_steer_degrees;
+  static const float max_steer_radians;
+  static const float turn_radius;
+  static const float front_outer_wheel_turn_radius;
+  static const float front_inner_wheel_turn_radius;
+  static const float rear_outer_wheel_turn_radius;
+  static const float rear_inner_wheel_turn_radius;
+
 
   typedef boost::shared_ptr< ::art_msgs::ArtVehicle_<ContainerAllocator> > Ptr;
   typedef boost::shared_ptr< ::art_msgs::ArtVehicle_<ContainerAllocator> const> ConstPtr;
@@ -120,670 +120,670 @@ typedef boost::shared_ptr< ::art_msgs::ArtVehicle const> ArtVehicleConstPtr;
 
 // constants requiring out of line definition
 
-   
-   template<typename ContainerAllocator> const std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other > 
-      ArtVehicle_<ContainerAllocator>::frame_id =
-        
-          "\"vehicle\""
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::length =
-        
-          3.25
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::width =
-        
-          1.397
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::height =
-        
-          1.778
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::halflength =
-        
-          1.625
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::halfwidth =
-        
-          0.6985
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::halfheight =
-        
-          0.889
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::wheelbase =
-        
-          2.59
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::lane_width =
-        
-          4.0
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::turning_radius =
-        
-          4.6
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::weight_curb =
-        
-          376.0
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::weight_max_payload =
-        
-          421.8
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::weight_gross =
-        
-          998.0
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::weight =
-        
-          700.0
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::max_accel =
-        
-          1.2
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::max_decl =
-        
-          3.2
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::max_speed =
-        
-          6.7056
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::front_bumper_px =
-        
-          3.5
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::rear_bumper_px =
-        
-          -1.3
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::front_left_wheel_px =
-        
-          2.33918
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::front_left_wheel_py =
-        
-          2.4
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::front_right_wheel_px =
-        
-          2.33918
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::front_right_wheel_py =
-        
-          -1.06
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::rear_left_wheel_px =
-        
-          0.0
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::rear_left_wheel_py =
-        
-          1.06
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::rear_right_wheel_px =
-        
-          0.0
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::rear_right_wheel_py =
-        
-          -1.06
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::geom_px =
-        
-          1.1
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::geom_py =
-        
-          0.0
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::geom_pa =
-        
-          0.0
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::velodyne_px =
-        
-          0.393
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::velodyne_py =
-        
-          0.278
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::velodyne_pz =
-        
-          2.4
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::velodyne_yaw =
-        
-          -0.02155
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::velodyne_pitch =
-        
-          0.0163537350912
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::velodyne_roll =
-        
-          0.0062133721371
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::front_SICK_px =
-        
-          3.178
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::front_SICK_py =
-        
-          0.0
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::front_SICK_pz =
-        
-          0.7
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::front_SICK_roll =
-        
-          0.0
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::front_SICK_pitch =
-        
-          0.0
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::front_SICK_yaw =
-        
-          0.027
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::rear_SICK_px =
-        
-          -1.14
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::rear_SICK_py =
-        
-          0.0
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::rear_SICK_pz =
-        
-          0.7
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::rear_SICK_roll =
-        
-          0.0
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::rear_SICK_pitch =
-        
-          0.0
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::rear_SICK_yaw =
-        
-          3.14159265359
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::center_front_camera_px =
-        
-          0.548
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::center_front_camera_py =
-        
-          0.278
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::center_front_camera_pz =
-        
-          2.184
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::center_front_camera_yaw =
-        
-          -0.052
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::center_front_camera_pitch =
-        
-          0.025
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::center_front_camera_roll =
-        
-          0.0
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::right_front_camera_px =
-        
-          0.471
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::right_front_camera_py =
-        
-          0.144
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::right_front_camera_pz =
-        
-          2.184
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::right_front_camera_yaw =
-        
-          -1.035
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::right_front_camera_pitch =
-        
-          0.022
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::right_front_camera_roll =
-        
-          0.0
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::left_front_camera_px =
-        
-          0.471
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::left_front_camera_py =
-        
-          0.412
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::left_front_camera_pz =
-        
-          2.184
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::left_front_camera_yaw =
-        
-          0.97
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::left_front_camera_pitch =
-        
-          -0.017
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::left_front_camera_roll =
-        
-          0.0
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::max_steer_degrees =
-        
-          29.0
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::max_steer_radians =
-        
-          0.5061455
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::turn_radius =
-        
-          4.21999225977
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::front_outer_wheel_turn_radius =
-        
-          5.7749529293
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::front_inner_wheel_turn_radius =
-        
-          3.93157909169
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::rear_outer_wheel_turn_radius =
-        
-          5.27999225977
-        
-        ;
-   
-
-   
-   template<typename ContainerAllocator> const float
-      ArtVehicle_<ContainerAllocator>::rear_inner_wheel_turn_radius =
-        
-          3.15999225977
-        
-        ;
-   
+
+template<typename ContainerAllocator> const std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other >
+ArtVehicle_<ContainerAllocator>::frame_id =
+
+  "\"vehicle\""
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::length =
+
+  3.25
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::width =
+
+  1.397
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::height =
+
+  1.778
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::halflength =
+
+  1.625
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::halfwidth =
+
+  0.6985
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::halfheight =
+
+  0.889
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::wheelbase =
+
+  2.59
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::lane_width =
+
+  4.0
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::turning_radius =
+
+  4.6
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::weight_curb =
+
+  376.0
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::weight_max_payload =
+
+  421.8
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::weight_gross =
+
+  998.0
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::weight =
+
+  700.0
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::max_accel =
+
+  1.2
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::max_decl =
+
+  3.2
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::max_speed =
+
+  6.7056
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::front_bumper_px =
+
+  3.5
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::rear_bumper_px =
+
+  -1.3
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::front_left_wheel_px =
+
+  2.33918
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::front_left_wheel_py =
+
+  2.4
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::front_right_wheel_px =
+
+  2.33918
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::front_right_wheel_py =
+
+  -1.06
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::rear_left_wheel_px =
+
+  0.0
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::rear_left_wheel_py =
+
+  1.06
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::rear_right_wheel_px =
+
+  0.0
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::rear_right_wheel_py =
+
+  -1.06
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::geom_px =
+
+  1.1
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::geom_py =
+
+  0.0
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::geom_pa =
+
+  0.0
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::velodyne_px =
+
+  0.393
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::velodyne_py =
+
+  0.278
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::velodyne_pz =
+
+  2.4
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::velodyne_yaw =
+
+  -0.02155
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::velodyne_pitch =
+
+  0.0163537350912
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::velodyne_roll =
+
+  0.0062133721371
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::front_SICK_px =
+
+  3.178
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::front_SICK_py =
+
+  0.0
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::front_SICK_pz =
+
+  0.7
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::front_SICK_roll =
+
+  0.0
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::front_SICK_pitch =
+
+  0.0
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::front_SICK_yaw =
+
+  0.027
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::rear_SICK_px =
+
+  -1.14
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::rear_SICK_py =
+
+  0.0
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::rear_SICK_pz =
+
+  0.7
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::rear_SICK_roll =
+
+  0.0
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::rear_SICK_pitch =
+
+  0.0
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::rear_SICK_yaw =
+
+  3.14159265359
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::center_front_camera_px =
+
+  0.548
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::center_front_camera_py =
+
+  0.278
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::center_front_camera_pz =
+
+  2.184
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::center_front_camera_yaw =
+
+  -0.052
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::center_front_camera_pitch =
+
+  0.025
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::center_front_camera_roll =
+
+  0.0
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::right_front_camera_px =
+
+  0.471
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::right_front_camera_py =
+
+  0.144
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::right_front_camera_pz =
+
+  2.184
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::right_front_camera_yaw =
+
+  -1.035
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::right_front_camera_pitch =
+
+  0.022
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::right_front_camera_roll =
+
+  0.0
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::left_front_camera_px =
+
+  0.471
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::left_front_camera_py =
+
+  0.412
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::left_front_camera_pz =
+
+  2.184
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::left_front_camera_yaw =
+
+  0.97
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::left_front_camera_pitch =
+
+  -0.017
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::left_front_camera_roll =
+
+  0.0
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::max_steer_degrees =
+
+  29.0
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::max_steer_radians =
+
+  0.5061455
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::turn_radius =
+
+  4.21999225977
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::front_outer_wheel_turn_radius =
+
+  5.7749529293
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::front_inner_wheel_turn_radius =
+
+  3.93157909169
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::rear_outer_wheel_turn_radius =
+
+  5.27999225977
+
+  ;
+
+
+
+template<typename ContainerAllocator> const float
+ArtVehicle_<ContainerAllocator>::rear_inner_wheel_turn_radius =
+
+  3.15999225977
+
+  ;
+
 
 
 
 template<typename ContainerAllocator>
 std::ostream& operator<<(std::ostream& s, const ::art_msgs::ArtVehicle_<ContainerAllocator> & v)
 {
-ros::message_operations::Printer< ::art_msgs::ArtVehicle_<ContainerAllocator> >::stream(s, "", v);
-return s;
+  ros::message_operations::Printer< ::art_msgs::ArtVehicle_<ContainerAllocator> >::stream(s, "", v);
+  return s;
 }
 
 } // namespace art_msgs
@@ -805,33 +805,33 @@ namespace message_traits
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::ArtVehicle_<ContainerAllocator> >
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::ArtVehicle_<ContainerAllocator> const>
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::ArtVehicle_<ContainerAllocator> >
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::ArtVehicle_<ContainerAllocator> const>
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::ArtVehicle_<ContainerAllocator> >
-  : FalseType
-  { };
+    : FalseType
+{ };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::ArtVehicle_<ContainerAllocator> const>
-  : FalseType
-  { };
+    : FalseType
+{ };
 
 
 template<class ContainerAllocator>
@@ -842,7 +842,10 @@ struct MD5Sum< ::art_msgs::ArtVehicle_<ContainerAllocator> >
     return "5d4205a78afea958dd39245561302a13";
   }
 
-  static const char* value(const ::art_msgs::ArtVehicle_<ContainerAllocator>&) { return value(); }
+  static const char* value(const ::art_msgs::ArtVehicle_<ContainerAllocator>&)
+  {
+    return value();
+  }
   static const uint64_t static_value1 = 0x5d4205a78afea958ULL;
   static const uint64_t static_value2 = 0xdd39245561302a13ULL;
 };
@@ -855,7 +858,10 @@ struct DataType< ::art_msgs::ArtVehicle_<ContainerAllocator> >
     return "art_msgs/ArtVehicle";
   }
 
-  static const char* value(const ::art_msgs::ArtVehicle_<ContainerAllocator>&) { return value(); }
+  static const char* value(const ::art_msgs::ArtVehicle_<ContainerAllocator>&)
+  {
+    return value();
+  }
 };
 
 template<class ContainerAllocator>
@@ -993,7 +999,10 @@ float32 rear_inner_wheel_turn_radius = 3.1599922597674142\n\
 ";
   }
 
-  static const char* value(const ::art_msgs::ArtVehicle_<ContainerAllocator>&) { return value(); }
+  static const char* value(const ::art_msgs::ArtVehicle_<ContainerAllocator>&)
+  {
+    return value();
+  }
 };
 
 } // namespace message_traits
@@ -1004,13 +1013,13 @@ namespace ros
 namespace serialization
 {
 
-  template<class ContainerAllocator> struct Serializer< ::art_msgs::ArtVehicle_<ContainerAllocator> >
-  {
-    template<typename Stream, typename T> inline static void allInOne(Stream&, T)
-    {}
+template<class ContainerAllocator> struct Serializer< ::art_msgs::ArtVehicle_<ContainerAllocator> >
+{
+  template<typename Stream, typename T> inline static void allInOne(Stream&, T)
+  {}
 
-    ROS_DECLARE_ALLINONE_SERIALIZER;
-  }; // struct ArtVehicle_
+  ROS_DECLARE_ALLINONE_SERIALIZER;
+}; // struct ArtVehicle_
 
 } // namespace serialization
 } // namespace ros

@@ -37,8 +37,9 @@ struct GpsInfo_
     , err_horz(0.0)
     , err_vert(0.0)
     , quality(0)
-    , num_sats(0)  {
-    }
+    , num_sats(0)
+  {
+  }
   GpsInfo_(const ContainerAllocator& _alloc)
     : header(_alloc)
     , latitude(0.0)
@@ -52,55 +53,56 @@ struct GpsInfo_
     , err_horz(0.0)
     , err_vert(0.0)
     , quality(0)
-    , num_sats(0)  {
-    }
+    , num_sats(0)
+  {
+  }
 
 
 
-   typedef  ::std_msgs::Header_<ContainerAllocator>  _header_type;
+  typedef  ::std_msgs::Header_<ContainerAllocator>  _header_type;
   _header_type header;
 
-   typedef double _latitude_type;
+  typedef double _latitude_type;
   _latitude_type latitude;
 
-   typedef double _longitude_type;
+  typedef double _longitude_type;
   _longitude_type longitude;
 
-   typedef double _altitude_type;
+  typedef double _altitude_type;
   _altitude_type altitude;
 
-   typedef double _utm_e_type;
+  typedef double _utm_e_type;
   _utm_e_type utm_e;
 
-   typedef double _utm_n_type;
+  typedef double _utm_n_type;
   _utm_n_type utm_n;
 
-   typedef std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other >  _zone_type;
+  typedef std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other >  _zone_type;
   _zone_type zone;
 
-   typedef double _hdop_type;
+  typedef double _hdop_type;
   _hdop_type hdop;
 
-   typedef double _vdop_type;
+  typedef double _vdop_type;
   _vdop_type vdop;
 
-   typedef double _err_horz_type;
+  typedef double _err_horz_type;
   _err_horz_type err_horz;
 
-   typedef double _err_vert_type;
+  typedef double _err_vert_type;
   _err_vert_type err_vert;
 
-   typedef uint16_t _quality_type;
+  typedef uint16_t _quality_type;
   _quality_type quality;
 
-   typedef uint16_t _num_sats_type;
+  typedef uint16_t _num_sats_type;
   _num_sats_type num_sats;
 
 
-    enum { INVALID_FIX = 0u };
-     enum { GPS_FIX = 1u };
-     enum { DGPS_FIX = 2u };
- 
+  enum { INVALID_FIX = 0u };
+  enum { GPS_FIX = 1u };
+  enum { DGPS_FIX = 2u };
+
 
   typedef boost::shared_ptr< ::art_msgs::GpsInfo_<ContainerAllocator> > Ptr;
   typedef boost::shared_ptr< ::art_msgs::GpsInfo_<ContainerAllocator> const> ConstPtr;
@@ -114,19 +116,19 @@ typedef boost::shared_ptr< ::art_msgs::GpsInfo const> GpsInfoConstPtr;
 
 // constants requiring out of line definition
 
-   
 
-   
 
-   
+
+
+
 
 
 
 template<typename ContainerAllocator>
 std::ostream& operator<<(std::ostream& s, const ::art_msgs::GpsInfo_<ContainerAllocator> & v)
 {
-ros::message_operations::Printer< ::art_msgs::GpsInfo_<ContainerAllocator> >::stream(s, "", v);
-return s;
+  ros::message_operations::Printer< ::art_msgs::GpsInfo_<ContainerAllocator> >::stream(s, "", v);
+  return s;
 }
 
 } // namespace art_msgs
@@ -148,33 +150,33 @@ namespace message_traits
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::GpsInfo_<ContainerAllocator> >
-  : FalseType
-  { };
+    : FalseType
+{ };
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::GpsInfo_<ContainerAllocator> const>
-  : FalseType
-  { };
+    : FalseType
+{ };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::GpsInfo_<ContainerAllocator> >
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::GpsInfo_<ContainerAllocator> const>
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::GpsInfo_<ContainerAllocator> >
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::GpsInfo_<ContainerAllocator> const>
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 
 template<class ContainerAllocator>
@@ -185,7 +187,10 @@ struct MD5Sum< ::art_msgs::GpsInfo_<ContainerAllocator> >
     return "4f5e197f8744c1a11f1c94dc6e9a77a6";
   }
 
-  static const char* value(const ::art_msgs::GpsInfo_<ContainerAllocator>&) { return value(); }
+  static const char* value(const ::art_msgs::GpsInfo_<ContainerAllocator>&)
+  {
+    return value();
+  }
   static const uint64_t static_value1 = 0x4f5e197f8744c1a1ULL;
   static const uint64_t static_value2 = 0x1f1c94dc6e9a77a6ULL;
 };
@@ -198,7 +203,10 @@ struct DataType< ::art_msgs::GpsInfo_<ContainerAllocator> >
     return "art_msgs/GpsInfo";
   }
 
-  static const char* value(const ::art_msgs::GpsInfo_<ContainerAllocator>&) { return value(); }
+  static const char* value(const ::art_msgs::GpsInfo_<ContainerAllocator>&)
+  {
+    return value();
+  }
 };
 
 template<class ContainerAllocator>
@@ -277,7 +285,10 @@ string frame_id\n\
 ";
   }
 
-  static const char* value(const ::art_msgs::GpsInfo_<ContainerAllocator>&) { return value(); }
+  static const char* value(const ::art_msgs::GpsInfo_<ContainerAllocator>&)
+  {
+    return value();
+  }
 };
 
 } // namespace message_traits
@@ -288,27 +299,27 @@ namespace ros
 namespace serialization
 {
 
-  template<class ContainerAllocator> struct Serializer< ::art_msgs::GpsInfo_<ContainerAllocator> >
+template<class ContainerAllocator> struct Serializer< ::art_msgs::GpsInfo_<ContainerAllocator> >
+{
+  template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
   {
-    template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
-    {
-      stream.next(m.header);
-      stream.next(m.latitude);
-      stream.next(m.longitude);
-      stream.next(m.altitude);
-      stream.next(m.utm_e);
-      stream.next(m.utm_n);
-      stream.next(m.zone);
-      stream.next(m.hdop);
-      stream.next(m.vdop);
-      stream.next(m.err_horz);
-      stream.next(m.err_vert);
-      stream.next(m.quality);
-      stream.next(m.num_sats);
-    }
+    stream.next(m.header);
+    stream.next(m.latitude);
+    stream.next(m.longitude);
+    stream.next(m.altitude);
+    stream.next(m.utm_e);
+    stream.next(m.utm_n);
+    stream.next(m.zone);
+    stream.next(m.hdop);
+    stream.next(m.vdop);
+    stream.next(m.err_horz);
+    stream.next(m.err_vert);
+    stream.next(m.quality);
+    stream.next(m.num_sats);
+  }
 
-    ROS_DECLARE_ALLINONE_SERIALIZER;
-  }; // struct GpsInfo_
+  ROS_DECLARE_ALLINONE_SERIALIZER;
+}; // struct GpsInfo_
 
 } // namespace serialization
 } // namespace ros

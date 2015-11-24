@@ -3,14 +3,14 @@
  *  Copyright (C) 2005, 2007, 2009 Austin Robot Technology
  *
  *  License: Modified BSD Software License Agreement
- * 
+ *
  *  $Id: 170169953038383a9a3e2f7094765477263d3270 $
  */
 
 /**  \file
- 
+
  Model speed and turn rate of the ART autonomous vehicle.
- 
+
  \author Jack O'Quin
 
  */

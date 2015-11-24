@@ -29,31 +29,33 @@ struct BrakeState_
     , position(0.0)
     , potentiometer(0.0)
     , encoder(0.0)
-    , pressure(0.0)  {
-    }
+    , pressure(0.0)
+  {
+  }
   BrakeState_(const ContainerAllocator& _alloc)
     : header(_alloc)
     , position(0.0)
     , potentiometer(0.0)
     , encoder(0.0)
-    , pressure(0.0)  {
-    }
+    , pressure(0.0)
+  {
+  }
 
 
 
-   typedef  ::std_msgs::Header_<ContainerAllocator>  _header_type;
+  typedef  ::std_msgs::Header_<ContainerAllocator>  _header_type;
   _header_type header;
 
-   typedef float _position_type;
+  typedef float _position_type;
   _position_type position;
 
-   typedef float _potentiometer_type;
+  typedef float _potentiometer_type;
   _potentiometer_type potentiometer;
 
-   typedef float _encoder_type;
+  typedef float _encoder_type;
   _encoder_type encoder;
 
-   typedef float _pressure_type;
+  typedef float _pressure_type;
   _pressure_type pressure;
 
 
@@ -76,8 +78,8 @@ typedef boost::shared_ptr< ::art_msgs::BrakeState const> BrakeStateConstPtr;
 template<typename ContainerAllocator>
 std::ostream& operator<<(std::ostream& s, const ::art_msgs::BrakeState_<ContainerAllocator> & v)
 {
-ros::message_operations::Printer< ::art_msgs::BrakeState_<ContainerAllocator> >::stream(s, "", v);
-return s;
+  ros::message_operations::Printer< ::art_msgs::BrakeState_<ContainerAllocator> >::stream(s, "", v);
+  return s;
 }
 
 } // namespace art_msgs
@@ -99,33 +101,33 @@ namespace message_traits
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::BrakeState_<ContainerAllocator> >
-  : FalseType
-  { };
+    : FalseType
+{ };
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::BrakeState_<ContainerAllocator> const>
-  : FalseType
-  { };
+    : FalseType
+{ };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::BrakeState_<ContainerAllocator> >
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::BrakeState_<ContainerAllocator> const>
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::BrakeState_<ContainerAllocator> >
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::BrakeState_<ContainerAllocator> const>
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 
 template<class ContainerAllocator>
@@ -136,7 +138,10 @@ struct MD5Sum< ::art_msgs::BrakeState_<ContainerAllocator> >
     return "a2cf66ca94ba3a72fab2bbf4fd458de0";
   }
 
-  static const char* value(const ::art_msgs::BrakeState_<ContainerAllocator>&) { return value(); }
+  static const char* value(const ::art_msgs::BrakeState_<ContainerAllocator>&)
+  {
+    return value();
+  }
   static const uint64_t static_value1 = 0xa2cf66ca94ba3a72ULL;
   static const uint64_t static_value2 = 0xfab2bbf4fd458de0ULL;
 };
@@ -149,7 +154,10 @@ struct DataType< ::art_msgs::BrakeState_<ContainerAllocator> >
     return "art_msgs/BrakeState";
   }
 
-  static const char* value(const ::art_msgs::BrakeState_<ContainerAllocator>&) { return value(); }
+  static const char* value(const ::art_msgs::BrakeState_<ContainerAllocator>&)
+  {
+    return value();
+  }
 };
 
 template<class ContainerAllocator>
@@ -189,7 +197,10 @@ string frame_id\n\
 ";
   }
 
-  static const char* value(const ::art_msgs::BrakeState_<ContainerAllocator>&) { return value(); }
+  static const char* value(const ::art_msgs::BrakeState_<ContainerAllocator>&)
+  {
+    return value();
+  }
 };
 
 } // namespace message_traits
@@ -200,19 +211,19 @@ namespace ros
 namespace serialization
 {
 
-  template<class ContainerAllocator> struct Serializer< ::art_msgs::BrakeState_<ContainerAllocator> >
+template<class ContainerAllocator> struct Serializer< ::art_msgs::BrakeState_<ContainerAllocator> >
+{
+  template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
   {
-    template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
-    {
-      stream.next(m.header);
-      stream.next(m.position);
-      stream.next(m.potentiometer);
-      stream.next(m.encoder);
-      stream.next(m.pressure);
-    }
+    stream.next(m.header);
+    stream.next(m.position);
+    stream.next(m.potentiometer);
+    stream.next(m.encoder);
+    stream.next(m.pressure);
+  }
 
-    ROS_DECLARE_ALLINONE_SERIALIZER;
-  }; // struct BrakeState_
+  ROS_DECLARE_ALLINONE_SERIALIZER;
+}; // struct BrakeState_
 
 } // namespace serialization
 } // namespace ros

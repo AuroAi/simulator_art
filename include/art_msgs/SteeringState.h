@@ -29,27 +29,29 @@ struct SteeringState_
     : header()
     , driver()
     , angle(0.0)
-    , sensor(0.0)  {
-    }
+    , sensor(0.0)
+  {
+  }
   SteeringState_(const ContainerAllocator& _alloc)
     : header(_alloc)
     , driver(_alloc)
     , angle(0.0)
-    , sensor(0.0)  {
-    }
+    , sensor(0.0)
+  {
+  }
 
 
 
-   typedef  ::std_msgs::Header_<ContainerAllocator>  _header_type;
+  typedef  ::std_msgs::Header_<ContainerAllocator>  _header_type;
   _header_type header;
 
-   typedef  ::art_msgs::DriverState_<ContainerAllocator>  _driver_type;
+  typedef  ::art_msgs::DriverState_<ContainerAllocator>  _driver_type;
   _driver_type driver;
 
-   typedef float _angle_type;
+  typedef float _angle_type;
   _angle_type angle;
 
-   typedef float _sensor_type;
+  typedef float _sensor_type;
   _sensor_type sensor;
 
 
@@ -72,8 +74,8 @@ typedef boost::shared_ptr< ::art_msgs::SteeringState const> SteeringStateConstPt
 template<typename ContainerAllocator>
 std::ostream& operator<<(std::ostream& s, const ::art_msgs::SteeringState_<ContainerAllocator> & v)
 {
-ros::message_operations::Printer< ::art_msgs::SteeringState_<ContainerAllocator> >::stream(s, "", v);
-return s;
+  ros::message_operations::Printer< ::art_msgs::SteeringState_<ContainerAllocator> >::stream(s, "", v);
+  return s;
 }
 
 } // namespace art_msgs
@@ -95,33 +97,33 @@ namespace message_traits
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::SteeringState_<ContainerAllocator> >
-  : FalseType
-  { };
+    : FalseType
+{ };
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::SteeringState_<ContainerAllocator> const>
-  : FalseType
-  { };
+    : FalseType
+{ };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::SteeringState_<ContainerAllocator> >
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::SteeringState_<ContainerAllocator> const>
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::SteeringState_<ContainerAllocator> >
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::SteeringState_<ContainerAllocator> const>
-  : TrueType
-  { };
+    : TrueType
+{ };
 
 
 template<class ContainerAllocator>
@@ -132,7 +134,10 @@ struct MD5Sum< ::art_msgs::SteeringState_<ContainerAllocator> >
     return "7bf11da138f80579d285d99bea47f6d3";
   }
 
-  static const char* value(const ::art_msgs::SteeringState_<ContainerAllocator>&) { return value(); }
+  static const char* value(const ::art_msgs::SteeringState_<ContainerAllocator>&)
+  {
+    return value();
+  }
   static const uint64_t static_value1 = 0x7bf11da138f80579ULL;
   static const uint64_t static_value2 = 0xd285d99bea47f6d3ULL;
 };
@@ -145,7 +150,10 @@ struct DataType< ::art_msgs::SteeringState_<ContainerAllocator> >
     return "art_msgs/SteeringState";
   }
 
-  static const char* value(const ::art_msgs::SteeringState_<ContainerAllocator>&) { return value(); }
+  static const char* value(const ::art_msgs::SteeringState_<ContainerAllocator>&)
+  {
+    return value();
+  }
 };
 
 template<class ContainerAllocator>
@@ -197,7 +205,10 @@ uint32 state\n\
 ";
   }
 
-  static const char* value(const ::art_msgs::SteeringState_<ContainerAllocator>&) { return value(); }
+  static const char* value(const ::art_msgs::SteeringState_<ContainerAllocator>&)
+  {
+    return value();
+  }
 };
 
 } // namespace message_traits
@@ -208,18 +219,18 @@ namespace ros
 namespace serialization
 {
 
-  template<class ContainerAllocator> struct Serializer< ::art_msgs::SteeringState_<ContainerAllocator> >
+template<class ContainerAllocator> struct Serializer< ::art_msgs::SteeringState_<ContainerAllocator> >
+{
+  template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
   {
-    template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
-    {
-      stream.next(m.header);
-      stream.next(m.driver);
-      stream.next(m.angle);
-      stream.next(m.sensor);
-    }
+    stream.next(m.header);
+    stream.next(m.driver);
+    stream.next(m.angle);
+    stream.next(m.sensor);
+  }
 
-    ROS_DECLARE_ALLINONE_SERIALIZER;
-  }; // struct SteeringState_
+  ROS_DECLARE_ALLINONE_SERIALIZER;
+}; // struct SteeringState_
 
 } // namespace serialization
 } // namespace ros
