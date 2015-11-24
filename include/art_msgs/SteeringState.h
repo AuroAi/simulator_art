@@ -21,23 +21,20 @@
 namespace art_msgs
 {
 template <class ContainerAllocator>
-struct SteeringState_
-{
+struct SteeringState_ {
   typedef SteeringState_<ContainerAllocator> Type;
 
   SteeringState_()
     : header()
-    , driver()
-    , angle(0.0)
-    , sensor(0.0)
-  {
+  , driver()
+  , angle(0.0)
+  , sensor(0.0) {
   }
   SteeringState_(const ContainerAllocator& _alloc)
     : header(_alloc)
-    , driver(_alloc)
-    , angle(0.0)
-    , sensor(0.0)
-  {
+  , driver(_alloc)
+  , angle(0.0)
+  , sensor(0.0) {
   }
 
 
@@ -97,45 +94,42 @@ namespace message_traits
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::SteeringState_<ContainerAllocator> >
-    : FalseType
+  : FalseType
 { };
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::SteeringState_<ContainerAllocator> const>
-    : FalseType
+  : FalseType
 { };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::SteeringState_<ContainerAllocator> >
-    : TrueType
+  : TrueType
 { };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::SteeringState_<ContainerAllocator> const>
-    : TrueType
+  : TrueType
 { };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::SteeringState_<ContainerAllocator> >
-    : TrueType
+  : TrueType
 { };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::SteeringState_<ContainerAllocator> const>
-    : TrueType
+  : TrueType
 { };
 
 
 template<class ContainerAllocator>
-struct MD5Sum< ::art_msgs::SteeringState_<ContainerAllocator> >
-{
-  static const char* value()
-  {
+struct MD5Sum< ::art_msgs::SteeringState_<ContainerAllocator> > {
+  static const char* value() {
     return "7bf11da138f80579d285d99bea47f6d3";
   }
 
-  static const char* value(const ::art_msgs::SteeringState_<ContainerAllocator>&)
-  {
+  static const char* value(const ::art_msgs::SteeringState_<ContainerAllocator>&) {
     return value();
   }
   static const uint64_t static_value1 = 0x7bf11da138f80579ULL;
@@ -143,24 +137,19 @@ struct MD5Sum< ::art_msgs::SteeringState_<ContainerAllocator> >
 };
 
 template<class ContainerAllocator>
-struct DataType< ::art_msgs::SteeringState_<ContainerAllocator> >
-{
-  static const char* value()
-  {
+struct DataType< ::art_msgs::SteeringState_<ContainerAllocator> > {
+  static const char* value() {
     return "art_msgs/SteeringState";
   }
 
-  static const char* value(const ::art_msgs::SteeringState_<ContainerAllocator>&)
-  {
+  static const char* value(const ::art_msgs::SteeringState_<ContainerAllocator>&) {
     return value();
   }
 };
 
 template<class ContainerAllocator>
-struct Definition< ::art_msgs::SteeringState_<ContainerAllocator> >
-{
-  static const char* value()
-  {
+struct Definition< ::art_msgs::SteeringState_<ContainerAllocator> > {
+  static const char* value() {
     return "# ART steering controller state message\n\
 \n\
 # $Id$\n\
@@ -203,62 +192,57 @@ uint32 RUNNING = 2      # Sending hardware commands\n\
 \n\
 uint32 state\n\
 ";
-  }
+         }
 
-  static const char* value(const ::art_msgs::SteeringState_<ContainerAllocator>&)
-  {
-    return value();
-  }
-};
+           static const char* value(const ::art_msgs::SteeringState_<ContainerAllocator>&) {
+           return value();
+         }
+         };
 
-} // namespace message_traits
-} // namespace ros
+         } // namespace message_traits
+         } // namespace ros
 
-namespace ros
-{
-namespace serialization
-{
+           namespace ros
+           {
+           namespace serialization
+           {
 
-template<class ContainerAllocator> struct Serializer< ::art_msgs::SteeringState_<ContainerAllocator> >
-{
-  template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
-  {
-    stream.next(m.header);
-    stream.next(m.driver);
-    stream.next(m.angle);
-    stream.next(m.sensor);
-  }
+           template<class ContainerAllocator> struct Serializer< ::art_msgs::SteeringState_<ContainerAllocator> > {
+           template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m) {
+           stream.next(m.header);
+           stream.next(m.driver);
+           stream.next(m.angle);
+           stream.next(m.sensor);
+         }
 
-  ROS_DECLARE_ALLINONE_SERIALIZER;
-}; // struct SteeringState_
+           ROS_DECLARE_ALLINONE_SERIALIZER;
+         }; // struct SteeringState_
 
-} // namespace serialization
-} // namespace ros
+         } // namespace serialization
+         } // namespace ros
 
-namespace ros
-{
-namespace message_operations
-{
+           namespace ros
+           {
+           namespace message_operations
+           {
 
-template<class ContainerAllocator>
-struct Printer< ::art_msgs::SteeringState_<ContainerAllocator> >
-{
-  template<typename Stream> static void stream(Stream& s, const std::string& indent, const ::art_msgs::SteeringState_<ContainerAllocator>& v)
-  {
-    s << indent << "header: ";
-    s << std::endl;
-    Printer< ::std_msgs::Header_<ContainerAllocator> >::stream(s, indent + "  ", v.header);
-    s << indent << "driver: ";
-    s << std::endl;
-    Printer< ::art_msgs::DriverState_<ContainerAllocator> >::stream(s, indent + "  ", v.driver);
-    s << indent << "angle: ";
-    Printer<float>::stream(s, indent + "  ", v.angle);
-    s << indent << "sensor: ";
-    Printer<float>::stream(s, indent + "  ", v.sensor);
-  }
-};
+           template<class ContainerAllocator>
+           struct Printer< ::art_msgs::SteeringState_<ContainerAllocator> > {
+           template<typename Stream> static void stream(Stream& s, const std::string& indent, const ::art_msgs::SteeringState_<ContainerAllocator>& v) {
+       s << indent << "header: ";
+           s << std::endl;
+           Printer< ::std_msgs::Header_<ContainerAllocator> >::stream(s, indent + "  ", v.header);
+       s << indent << "driver: ";
+           s << std::endl;
+           Printer< ::art_msgs::DriverState_<ContainerAllocator> >::stream(s, indent + "  ", v.driver);
+       s << indent << "angle: ";
+           Printer<float>::stream(s, indent + "  ", v.angle);
+       s << indent << "sensor: ";
+           Printer<float>::stream(s, indent + "  ", v.sensor);
+         }
+         };
 
-} // namespace message_operations
-} // namespace ros
+         } // namespace message_operations
+         } // namespace ros
 
 #endif // ART_MSGS_MESSAGE_STEERINGSTATE_H

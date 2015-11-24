@@ -73,7 +73,7 @@ static inline double angle_to_yaw(double v, float angle)
 }
 
 const double maximum_yaw =
-  angle_to_yaw(steer_speed_min, art_msgs::ArtVehicle::max_steer_degrees);
+    angle_to_yaw(steer_speed_min, art_msgs::ArtVehicle::max_steer_degrees);
 }
 
 #endif // _STEERING_H

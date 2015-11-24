@@ -20,21 +20,18 @@
 namespace art_msgs
 {
 template <class ContainerAllocator>
-struct Shifter_
-{
+struct Shifter_ {
   typedef Shifter_<ContainerAllocator> Type;
 
   Shifter_()
     : header()
-    , gear(0)
-    , relays(0)
-  {
+  , gear(0)
+  , relays(0) {
   }
   Shifter_(const ContainerAllocator& _alloc)
     : header(_alloc)
-    , gear(0)
-    , relays(0)
-  {
+  , gear(0)
+  , relays(0) {
   }
 
 
@@ -106,45 +103,42 @@ namespace message_traits
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::Shifter_<ContainerAllocator> >
-    : FalseType
+  : FalseType
 { };
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::Shifter_<ContainerAllocator> const>
-    : FalseType
+  : FalseType
 { };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::Shifter_<ContainerAllocator> >
-    : TrueType
+  : TrueType
 { };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::Shifter_<ContainerAllocator> const>
-    : TrueType
+  : TrueType
 { };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::Shifter_<ContainerAllocator> >
-    : TrueType
+  : TrueType
 { };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::Shifter_<ContainerAllocator> const>
-    : TrueType
+  : TrueType
 { };
 
 
 template<class ContainerAllocator>
-struct MD5Sum< ::art_msgs::Shifter_<ContainerAllocator> >
-{
-  static const char* value()
-  {
+struct MD5Sum< ::art_msgs::Shifter_<ContainerAllocator> > {
+  static const char* value() {
     return "dddb61d8575e01ea7857ef1b3a7b941c";
   }
 
-  static const char* value(const ::art_msgs::Shifter_<ContainerAllocator>&)
-  {
+  static const char* value(const ::art_msgs::Shifter_<ContainerAllocator>&) {
     return value();
   }
   static const uint64_t static_value1 = 0xdddb61d8575e01eaULL;
@@ -152,24 +146,19 @@ struct MD5Sum< ::art_msgs::Shifter_<ContainerAllocator> >
 };
 
 template<class ContainerAllocator>
-struct DataType< ::art_msgs::Shifter_<ContainerAllocator> >
-{
-  static const char* value()
-  {
+struct DataType< ::art_msgs::Shifter_<ContainerAllocator> > {
+  static const char* value() {
     return "art_msgs/Shifter";
   }
 
-  static const char* value(const ::art_msgs::Shifter_<ContainerAllocator>&)
-  {
+  static const char* value(const ::art_msgs::Shifter_<ContainerAllocator>&) {
     return value();
   }
 };
 
 template<class ContainerAllocator>
-struct Definition< ::art_msgs::Shifter_<ContainerAllocator> >
-{
-  static const char* value()
-  {
+struct Definition< ::art_msgs::Shifter_<ContainerAllocator> > {
+  static const char* value() {
     return "# ART shifter message\n\
 #\n\
 # Used to both request and report gear shifts.\n\
@@ -212,58 +201,53 @@ time stamp\n\
 # 1: global frame\n\
 string frame_id\n\
 ";
-  }
+         }
 
-  static const char* value(const ::art_msgs::Shifter_<ContainerAllocator>&)
-  {
-    return value();
-  }
-};
+           static const char* value(const ::art_msgs::Shifter_<ContainerAllocator>&) {
+           return value();
+         }
+         };
 
-} // namespace message_traits
-} // namespace ros
+         } // namespace message_traits
+         } // namespace ros
 
-namespace ros
-{
-namespace serialization
-{
+           namespace ros
+           {
+           namespace serialization
+           {
 
-template<class ContainerAllocator> struct Serializer< ::art_msgs::Shifter_<ContainerAllocator> >
-{
-  template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
-  {
-    stream.next(m.header);
-    stream.next(m.gear);
-    stream.next(m.relays);
-  }
+           template<class ContainerAllocator> struct Serializer< ::art_msgs::Shifter_<ContainerAllocator> > {
+           template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m) {
+           stream.next(m.header);
+           stream.next(m.gear);
+           stream.next(m.relays);
+         }
 
-  ROS_DECLARE_ALLINONE_SERIALIZER;
-}; // struct Shifter_
+           ROS_DECLARE_ALLINONE_SERIALIZER;
+         }; // struct Shifter_
 
-} // namespace serialization
-} // namespace ros
+         } // namespace serialization
+         } // namespace ros
 
-namespace ros
-{
-namespace message_operations
-{
+           namespace ros
+           {
+           namespace message_operations
+           {
 
-template<class ContainerAllocator>
-struct Printer< ::art_msgs::Shifter_<ContainerAllocator> >
-{
-  template<typename Stream> static void stream(Stream& s, const std::string& indent, const ::art_msgs::Shifter_<ContainerAllocator>& v)
-  {
-    s << indent << "header: ";
-    s << std::endl;
-    Printer< ::std_msgs::Header_<ContainerAllocator> >::stream(s, indent + "  ", v.header);
-    s << indent << "gear: ";
-    Printer<uint8_t>::stream(s, indent + "  ", v.gear);
-    s << indent << "relays: ";
-    Printer<uint8_t>::stream(s, indent + "  ", v.relays);
-  }
-};
+           template<class ContainerAllocator>
+           struct Printer< ::art_msgs::Shifter_<ContainerAllocator> > {
+           template<typename Stream> static void stream(Stream& s, const std::string& indent, const ::art_msgs::Shifter_<ContainerAllocator>& v) {
+       s << indent << "header: ";
+           s << std::endl;
+           Printer< ::std_msgs::Header_<ContainerAllocator> >::stream(s, indent + "  ", v.header);
+       s << indent << "gear: ";
+           Printer<uint8_t>::stream(s, indent + "  ", v.gear);
+       s << indent << "relays: ";
+           Printer<uint8_t>::stream(s, indent + "  ", v.relays);
+         }
+         };
 
-} // namespace message_operations
-} // namespace ros
+         } // namespace message_operations
+         } // namespace ros
 
 #endif // ART_MSGS_MESSAGE_SHIFTER_H

@@ -19,17 +19,14 @@
 namespace art_msgs
 {
 template <class ContainerAllocator>
-struct DriverState_
-{
+struct DriverState_ {
   typedef DriverState_<ContainerAllocator> Type;
 
   DriverState_()
-    : state(0)
-  {
+    : state(0) {
   }
   DriverState_(const ContainerAllocator& _alloc)
-    : state(0)
-  {
+    : state(0) {
   }
 
 
@@ -89,45 +86,42 @@ namespace message_traits
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::DriverState_<ContainerAllocator> >
-    : TrueType
+  : TrueType
 { };
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::DriverState_<ContainerAllocator> const>
-    : TrueType
+  : TrueType
 { };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::DriverState_<ContainerAllocator> >
-    : TrueType
+  : TrueType
 { };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::DriverState_<ContainerAllocator> const>
-    : TrueType
+  : TrueType
 { };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::DriverState_<ContainerAllocator> >
-    : FalseType
+  : FalseType
 { };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::DriverState_<ContainerAllocator> const>
-    : FalseType
+  : FalseType
 { };
 
 
 template<class ContainerAllocator>
-struct MD5Sum< ::art_msgs::DriverState_<ContainerAllocator> >
-{
-  static const char* value()
-  {
+struct MD5Sum< ::art_msgs::DriverState_<ContainerAllocator> > {
+  static const char* value() {
     return "92d8e6361001072f038b293728a430f0";
   }
 
-  static const char* value(const ::art_msgs::DriverState_<ContainerAllocator>&)
-  {
+  static const char* value(const ::art_msgs::DriverState_<ContainerAllocator>&) {
     return value();
   }
   static const uint64_t static_value1 = 0x92d8e6361001072fULL;
@@ -135,24 +129,19 @@ struct MD5Sum< ::art_msgs::DriverState_<ContainerAllocator> >
 };
 
 template<class ContainerAllocator>
-struct DataType< ::art_msgs::DriverState_<ContainerAllocator> >
-{
-  static const char* value()
-  {
+struct DataType< ::art_msgs::DriverState_<ContainerAllocator> > {
+  static const char* value() {
     return "art_msgs/DriverState";
   }
 
-  static const char* value(const ::art_msgs::DriverState_<ContainerAllocator>&)
-  {
+  static const char* value(const ::art_msgs::DriverState_<ContainerAllocator>&) {
     return value();
   }
 };
 
 template<class ContainerAllocator>
-struct Definition< ::art_msgs::DriverState_<ContainerAllocator> >
-{
-  static const char* value()
-  {
+struct Definition< ::art_msgs::DriverState_<ContainerAllocator> > {
+  static const char* value() {
     return "# ART driver states -- similar to those in driver_base.\n\
 \n\
 # $Id$\n\
@@ -164,51 +153,46 @@ uint32 RUNNING = 2      # Sending hardware commands\n\
 \n\
 uint32 state\n\
 ";
-  }
+         }
 
-  static const char* value(const ::art_msgs::DriverState_<ContainerAllocator>&)
-  {
-    return value();
-  }
-};
+           static const char* value(const ::art_msgs::DriverState_<ContainerAllocator>&) {
+           return value();
+         }
+         };
 
-} // namespace message_traits
-} // namespace ros
+         } // namespace message_traits
+         } // namespace ros
 
-namespace ros
-{
-namespace serialization
-{
+           namespace ros
+           {
+           namespace serialization
+           {
 
-template<class ContainerAllocator> struct Serializer< ::art_msgs::DriverState_<ContainerAllocator> >
-{
-  template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
-  {
-    stream.next(m.state);
-  }
+           template<class ContainerAllocator> struct Serializer< ::art_msgs::DriverState_<ContainerAllocator> > {
+           template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m) {
+           stream.next(m.state);
+         }
 
-  ROS_DECLARE_ALLINONE_SERIALIZER;
-}; // struct DriverState_
+           ROS_DECLARE_ALLINONE_SERIALIZER;
+         }; // struct DriverState_
 
-} // namespace serialization
-} // namespace ros
+         } // namespace serialization
+         } // namespace ros
 
-namespace ros
-{
-namespace message_operations
-{
+           namespace ros
+           {
+           namespace message_operations
+           {
 
-template<class ContainerAllocator>
-struct Printer< ::art_msgs::DriverState_<ContainerAllocator> >
-{
-  template<typename Stream> static void stream(Stream& s, const std::string& indent, const ::art_msgs::DriverState_<ContainerAllocator>& v)
-  {
-    s << indent << "state: ";
-    Printer<uint32_t>::stream(s, indent + "  ", v.state);
-  }
-};
+           template<class ContainerAllocator>
+           struct Printer< ::art_msgs::DriverState_<ContainerAllocator> > {
+           template<typename Stream> static void stream(Stream& s, const std::string& indent, const ::art_msgs::DriverState_<ContainerAllocator>& v) {
+       s << indent << "state: ";
+           Printer<uint32_t>::stream(s, indent + "  ", v.state);
+         }
+         };
 
-} // namespace message_operations
-} // namespace ros
+         } // namespace message_operations
+         } // namespace ros
 
 #endif // ART_MSGS_MESSAGE_DRIVERSTATE_H
