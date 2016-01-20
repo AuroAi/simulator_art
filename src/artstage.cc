@@ -349,7 +349,7 @@ StageNode::WorldCallback()
       		
         for(unsigned int i=0; i<s.ranges.size(); i++)
           {
-            this->laserMsgs[r].ranges[i] = int(s.ranges[i])==30?29.0:s.ranges[i];//s.ranges[i]
+            this->laserMsgs[r].ranges[i] = int(s.ranges[i])==s.range.max?(s.range.max -1):s.ranges[i];//s.ranges[i]
             this->laserMsgs[r].intensities[i] = (uint8_t)s.intensities[i];
           }
 
