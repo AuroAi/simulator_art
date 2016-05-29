@@ -20,38 +20,41 @@
 namespace art_msgs
 {
 template <class ContainerAllocator>
-struct GpsInfo_ {
+struct GpsInfo_
+{
   typedef GpsInfo_<ContainerAllocator> Type;
 
   GpsInfo_()
     : header()
-  , latitude(0.0)
-  , longitude(0.0)
-  , altitude(0.0)
-  , utm_e(0.0)
-  , utm_n(0.0)
-  , zone()
-  , hdop(0.0)
-  , vdop(0.0)
-  , err_horz(0.0)
-  , err_vert(0.0)
-  , quality(0)
-  , num_sats(0) {
+    , latitude(0.0)
+    , longitude(0.0)
+    , altitude(0.0)
+    , utm_e(0.0)
+    , utm_n(0.0)
+    , zone()
+    , hdop(0.0)
+    , vdop(0.0)
+    , err_horz(0.0)
+    , err_vert(0.0)
+    , quality(0)
+    , num_sats(0)
+  {
   }
   GpsInfo_(const ContainerAllocator& _alloc)
     : header(_alloc)
-  , latitude(0.0)
-  , longitude(0.0)
-  , altitude(0.0)
-  , utm_e(0.0)
-  , utm_n(0.0)
-  , zone(_alloc)
-  , hdop(0.0)
-  , vdop(0.0)
-  , err_horz(0.0)
-  , err_vert(0.0)
-  , quality(0)
-  , num_sats(0) {
+    , latitude(0.0)
+    , longitude(0.0)
+    , altitude(0.0)
+    , utm_e(0.0)
+    , utm_n(0.0)
+    , zone(_alloc)
+    , hdop(0.0)
+    , vdop(0.0)
+    , err_horz(0.0)
+    , err_vert(0.0)
+    , quality(0)
+    , num_sats(0)
+  {
   }
 
 
@@ -147,42 +150,45 @@ namespace message_traits
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::GpsInfo_<ContainerAllocator> >
-  : FalseType
+    : FalseType
 { };
 
 template <class ContainerAllocator>
 struct IsFixedSize< ::art_msgs::GpsInfo_<ContainerAllocator> const>
-  : FalseType
+    : FalseType
 { };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::GpsInfo_<ContainerAllocator> >
-  : TrueType
+    : TrueType
 { };
 
 template <class ContainerAllocator>
 struct IsMessage< ::art_msgs::GpsInfo_<ContainerAllocator> const>
-  : TrueType
+    : TrueType
 { };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::GpsInfo_<ContainerAllocator> >
-  : TrueType
+    : TrueType
 { };
 
 template <class ContainerAllocator>
 struct HasHeader< ::art_msgs::GpsInfo_<ContainerAllocator> const>
-  : TrueType
+    : TrueType
 { };
 
 
 template<class ContainerAllocator>
-struct MD5Sum< ::art_msgs::GpsInfo_<ContainerAllocator> > {
-  static const char* value() {
+struct MD5Sum< ::art_msgs::GpsInfo_<ContainerAllocator> >
+{
+  static const char* value()
+  {
     return "4f5e197f8744c1a11f1c94dc6e9a77a6";
   }
 
-  static const char* value(const ::art_msgs::GpsInfo_<ContainerAllocator>&) {
+  static const char* value(const ::art_msgs::GpsInfo_<ContainerAllocator>&)
+  {
     return value();
   }
   static const uint64_t static_value1 = 0x4f5e197f8744c1a1ULL;
@@ -190,19 +196,24 @@ struct MD5Sum< ::art_msgs::GpsInfo_<ContainerAllocator> > {
 };
 
 template<class ContainerAllocator>
-struct DataType< ::art_msgs::GpsInfo_<ContainerAllocator> > {
-  static const char* value() {
+struct DataType< ::art_msgs::GpsInfo_<ContainerAllocator> >
+{
+  static const char* value()
+  {
     return "art_msgs/GpsInfo";
   }
 
-  static const char* value(const ::art_msgs::GpsInfo_<ContainerAllocator>&) {
+  static const char* value(const ::art_msgs::GpsInfo_<ContainerAllocator>&)
+  {
     return value();
   }
 };
 
 template<class ContainerAllocator>
-struct Definition< ::art_msgs::GpsInfo_<ContainerAllocator> > {
-  static const char* value() {
+struct Definition< ::art_msgs::GpsInfo_<ContainerAllocator> >
+{
+  static const char* value()
+  {
     return "# GPS position message\n\
 #\n\
 # Probably to be replaced by a standard ROS message for Diamondback.\n\
@@ -272,83 +283,88 @@ time stamp\n\
 # 1: global frame\n\
 string frame_id\n\
 ";
-         }
+  }
 
-           static const char* value(const ::art_msgs::GpsInfo_<ContainerAllocator>&) {
-           return value();
-         }
-         };
+  static const char* value(const ::art_msgs::GpsInfo_<ContainerAllocator>&)
+  {
+    return value();
+  }
+};
 
-         } // namespace message_traits
-         } // namespace ros
+} // namespace message_traits
+} // namespace ros
 
-           namespace ros
-           {
-           namespace serialization
-           {
+namespace ros
+{
+namespace serialization
+{
 
-           template<class ContainerAllocator> struct Serializer< ::art_msgs::GpsInfo_<ContainerAllocator> > {
-           template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m) {
-           stream.next(m.header);
-           stream.next(m.latitude);
-           stream.next(m.longitude);
-           stream.next(m.altitude);
-           stream.next(m.utm_e);
-           stream.next(m.utm_n);
-           stream.next(m.zone);
-           stream.next(m.hdop);
-           stream.next(m.vdop);
-           stream.next(m.err_horz);
-           stream.next(m.err_vert);
-           stream.next(m.quality);
-           stream.next(m.num_sats);
-         }
+template<class ContainerAllocator> struct Serializer< ::art_msgs::GpsInfo_<ContainerAllocator> >
+{
+  template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
+  {
+    stream.next(m.header);
+    stream.next(m.latitude);
+    stream.next(m.longitude);
+    stream.next(m.altitude);
+    stream.next(m.utm_e);
+    stream.next(m.utm_n);
+    stream.next(m.zone);
+    stream.next(m.hdop);
+    stream.next(m.vdop);
+    stream.next(m.err_horz);
+    stream.next(m.err_vert);
+    stream.next(m.quality);
+    stream.next(m.num_sats);
+  }
 
-           ROS_DECLARE_ALLINONE_SERIALIZER;
-         }; // struct GpsInfo_
+  ROS_DECLARE_ALLINONE_SERIALIZER;
+}; // struct GpsInfo_
 
-         } // namespace serialization
-         } // namespace ros
+} // namespace serialization
+} // namespace ros
 
-           namespace ros
-           {
-           namespace message_operations
-           {
+namespace ros
+{
+namespace message_operations
+{
 
-           template<class ContainerAllocator>
-           struct Printer< ::art_msgs::GpsInfo_<ContainerAllocator> > {
-           template<typename Stream> static void stream(Stream& s, const std::string& indent, const ::art_msgs::GpsInfo_<ContainerAllocator>& v) {
-       s << indent << "header: ";
-           s << std::endl;
-           Printer< ::std_msgs::Header_<ContainerAllocator> >::stream(s, indent + "  ", v.header);
-       s << indent << "latitude: ";
-           Printer<double>::stream(s, indent + "  ", v.latitude);
-       s << indent << "longitude: ";
-           Printer<double>::stream(s, indent + "  ", v.longitude);
-       s << indent << "altitude: ";
-           Printer<double>::stream(s, indent + "  ", v.altitude);
-       s << indent << "utm_e: ";
-           Printer<double>::stream(s, indent + "  ", v.utm_e);
-       s << indent << "utm_n: ";
-           Printer<double>::stream(s, indent + "  ", v.utm_n);
-       s << indent << "zone: ";
-           Printer<std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other > >::stream(s, indent + "  ", v.zone);
-       s << indent << "hdop: ";
-           Printer<double>::stream(s, indent + "  ", v.hdop);
-       s << indent << "vdop: ";
-           Printer<double>::stream(s, indent + "  ", v.vdop);
-       s << indent << "err_horz: ";
-           Printer<double>::stream(s, indent + "  ", v.err_horz);
-       s << indent << "err_vert: ";
-           Printer<double>::stream(s, indent + "  ", v.err_vert);
-       s << indent << "quality: ";
-           Printer<uint16_t>::stream(s, indent + "  ", v.quality);
-       s << indent << "num_sats: ";
-           Printer<uint16_t>::stream(s, indent + "  ", v.num_sats);
-         }
-         };
+template<class ContainerAllocator>
+struct Printer< ::art_msgs::GpsInfo_<ContainerAllocator> >
+{
+  template<typename Stream> static void stream(Stream& s, const std::string& indent, const ::art_msgs::GpsInfo_<ContainerAllocator>& v)
+  {
+    s << indent << "header: ";
+    s << std::endl;
+    Printer< ::std_msgs::Header_<ContainerAllocator> >::stream(s, indent + "  ", v.header);
+    s << indent << "latitude: ";
+    Printer<double>::stream(s, indent + "  ", v.latitude);
+    s << indent << "longitude: ";
+    Printer<double>::stream(s, indent + "  ", v.longitude);
+    s << indent << "altitude: ";
+    Printer<double>::stream(s, indent + "  ", v.altitude);
+    s << indent << "utm_e: ";
+    Printer<double>::stream(s, indent + "  ", v.utm_e);
+    s << indent << "utm_n: ";
+    Printer<double>::stream(s, indent + "  ", v.utm_n);
+    s << indent << "zone: ";
+    Printer<std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other > >::stream(s, indent + "  ", v.zone);
+    s << indent << "hdop: ";
+    Printer<double>::stream(s, indent + "  ", v.hdop);
+    s << indent << "vdop: ";
+    Printer<double>::stream(s, indent + "  ", v.vdop);
+    s << indent << "err_horz: ";
+    Printer<double>::stream(s, indent + "  ", v.err_horz);
+    s << indent << "err_vert: ";
+    Printer<double>::stream(s, indent + "  ", v.err_vert);
+    s << indent << "quality: ";
+    Printer<uint16_t>::stream(s, indent + "  ", v.quality);
+    s << indent << "num_sats: ";
+    Printer<uint16_t>::stream(s, indent + "  ", v.num_sats);
+  }
+};
 
-         } // namespace message_operations
-         } // namespace ros
+} // namespace message_operations
+} // namespace ros
 
 #endif // ART_MSGS_MESSAGE_GPSINFO_H

@@ -46,10 +46,11 @@
 
 class ArtVehicleModel
 {
- public:
+public:
 
   // Constructor
-  ArtVehicleModel(Stg::ModelPosition *stgPos, tf::TransformBroadcaster *tfBroad, std::string ns_prefix) {
+  ArtVehicleModel(Stg::ModelPosition *stgPos, tf::TransformBroadcaster *tfBroad, std::string ns_prefix)
+  {
     stgp_ = stgPos;                     // Stage position model
     tf_ = tfBroad;                      // ROS transform broadcaster
     ns_prefix_ = ns_prefix;             // namespace prefix
@@ -63,14 +64,15 @@ class ArtVehicleModel
     show_pose_ = false;
     ros::param::get("show_pose", show_pose_);
   }
-  ~ArtVehicleModel() {
+  ~ArtVehicleModel()
+  {
   }
   ;
 
   void update(ros::Time sim_time);      // update vehicle model
   void setup(void);                     // set up ROS topics
 
- private:
+private:
 
   void ModelAcceleration(geometry_msgs::Twist *odomVel, sensor_msgs::Imu *imu_msg, ros::Time sim_time);
   void ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_msgs::Imu *imuMsg, ros::Time sim_time);

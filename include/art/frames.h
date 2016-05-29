@@ -49,14 +49,16 @@ const std::string right_front_camera_optical = "right_front_camera_optical";
 
 class VehicleRelative
 {
- public:
+public:
   VehicleRelative() {};
 
   /** \brief configure vehicle-relative transform prefix parameter */
-  void getPrefixParam(void) {
+  void getPrefixParam(void)
+  {
     ros::NodeHandle private_nh("~");
     std::string prefix_param;
-    if (private_nh.searchParam("tf_prefix", prefix_param)) {
+    if (private_nh.searchParam("tf_prefix", prefix_param))
+    {
       private_nh.getParam(prefix_param, prefix_);
       ROS_INFO_STREAM("vehicle-relative transform prefix: " << prefix_);
     }
@@ -67,11 +69,12 @@ class VehicleRelative
    *  \param relframe frame ID relative to vehicle
    *  \returns corresponding global frame ID
    */
-  inline std::string getFrame(std::string relframe) {
+  inline std::string getFrame(std::string relframe)
+  {
     return tf::resolve(prefix_, relframe);
   }
 
- private:
+private:
   std::string prefix_;                /**< vehicle frame prefix */
 };
 };

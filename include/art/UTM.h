@@ -175,7 +175,8 @@ static inline void LLtoUTM(const double Lat, const double Long,
     ZoneNumber = 32;
 
   // Special zones for Svalbard
-  if (Lat >= 72.0 && Lat < 84.0) {
+  if (Lat >= 72.0 && Lat < 84.0)
+  {
     if (LongTemp >= 0.0  && LongTemp <  9.0) ZoneNumber = 31;
     else if (LongTemp >= 9.0  && LongTemp < 21.0) ZoneNumber = 33;
     else if (LongTemp >= 21.0 && LongTemp < 33.0) ZoneNumber = 35;
@@ -213,7 +214,8 @@ static inline void LLtoUTM(const double Lat, const double Long,
                        * (A * A / 2 + (5 - T + 9 * C + 4 * C * C) * A * A * A * A / 24
                           + (61 - 58 * T + T * T + 600 * C - 330 * eccPrimeSquared) * A * A * A * A * A * A / 720)));
 
-  if (Lat < 0) {
+  if (Lat < 0)
+  {
     //10000000 meter offset for southern hemisphere
     UTMNorthing += 10000000.0;
   }
@@ -247,7 +249,8 @@ static inline void UTMtoLL(const double UTMNorthing, const double UTMEasting,
   y = UTMNorthing;
 
   ZoneNumber = strtoul(UTMZone, &ZoneLetter, 10);
-  if ((*ZoneLetter - 'N') < 0) {
+  if ((*ZoneLetter - 'N') < 0)
+  {
     //remove 10,000,000 meter offset used for southern hemisphere
     y -= 10000000.0;
   }
