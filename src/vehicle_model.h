@@ -39,22 +39,21 @@
 #include <ackermann_msgs/AckermannDriveStamped.h>
 #include <art_msgs/ArtVehicle.h>
 // Corresponding ROS relative names
-#define BRAKE_STATE    "brake/state"
-#define SHIFTER_STATE  "shifter/state"
+#define BRAKE_STATE "brake/state"
+#define SHIFTER_STATE "shifter/state"
 #define STEERING_STATE "steering/state"
 #define THROTTLE_STATE "throttle/state"
 
 class ArtVehicleModel
 {
 public:
-
   // Constructor
   ArtVehicleModel(Stg::ModelPosition *stgPos, tf::TransformBroadcaster *tfBroad, std::string ns_prefix)
   {
-    stgp_ = stgPos;                     // Stage position model
-    tf_ = tfBroad;                      // ROS transform broadcaster
-    ns_prefix_ = ns_prefix;             // namespace prefix
-    tf_prefix_ = ns_prefix + "/";       // transform ID prefix
+    stgp_ = stgPos;                // Stage position model
+    tf_ = tfBroad;                 // ROS transform broadcaster
+    ns_prefix_ = ns_prefix;        // namespace prefix
+    tf_prefix_ = ns_prefix + "/";  // transform ID prefix
 
     // servo control status
     brake_position_ = 1.0;
@@ -64,16 +63,12 @@ public:
     show_pose_ = false;
     ros::param::get("show_pose", show_pose_);
   }
-  ~ArtVehicleModel()
-  {
-  }
-  ;
+  ~ArtVehicleModel(){};
 
-  void update(ros::Time sim_time);      // update vehicle model
-  void setup(void);                     // set up ROS topics
+  void update(ros::Time sim_time);  // update vehicle model
+  void setup(void);                 // set up ROS topics
 
 private:
-
   void ModelAcceleration(geometry_msgs::Twist *odomVel, sensor_msgs::Imu *imu_msg, ros::Time sim_time);
   void ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_msgs::Imu *imuMsg, ros::Time sim_time);
 
@@ -81,10 +76,10 @@ private:
   Stg::ModelPosition *stgp_;
 
   // ROS interfaces
-  ros::NodeHandle node_;                // simulation node handle
-  tf::TransformBroadcaster *tf_;        // ROS transform broadcaster
-  std::string ns_prefix_;               // vehicle namespace
-  std::string tf_prefix_;               // transform ID prefix
+  ros::NodeHandle node_;          // simulation node handle
+  tf::TransformBroadcaster *tf_;  // ROS transform broadcaster
+  std::string ns_prefix_;         // vehicle namespace
+  std::string tf_prefix_;         // transform ID prefix
 
   nav_msgs::Odometry odomMsg_;
   ros::Publisher odom_pub_;
@@ -108,7 +103,7 @@ private:
   void shifterReceived(const art_msgs::Shifter::ConstPtr &msg);
   void steeringReceived(const art_msgs::SteeringState::ConstPtr &msg);
   void throttleReceived(const art_msgs::ThrottleState::ConstPtr &msg);
-  void ackermannCmdReceived(const ackermann_msgs::AckermannDriveStamped::ConstPtr& msg);
+  void ackermannCmdReceived(const ackermann_msgs::AckermannDriveStamped::ConstPtr &msg);
 
   // servo control status
   //
@@ -136,4 +131,4 @@ private:
   bool show_pose_;
 };
 
-#endif // _VEHICLE_MODEL_H_
+#endif  // _VEHICLE_MODEL_H_

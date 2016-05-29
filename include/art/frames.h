@@ -26,16 +26,16 @@
 namespace ArtFrames
 {
 /** Earth frame of reference */
-const std::string earth =     "earth";
+const std::string earth = "earth";
 
 /** odometry frame of reference */
-const std::string odom =      "odom";
+const std::string odom = "odom";
 
 /** vehicle-relative frame */
-const std::string vehicle =   "vehicle";
+const std::string vehicle = "vehicle";
 
 /** laser frames of reference */
-const std::string velodyne =  "velodyne";
+const std::string velodyne = "velodyne";
 const std::string front_sick = "front_sick";
 const std::string rear_sick = "rear_sick";
 
@@ -50,7 +50,7 @@ const std::string right_front_camera_optical = "right_front_camera_optical";
 class VehicleRelative
 {
 public:
-  VehicleRelative() {};
+  VehicleRelative(){};
 
   /** \brief configure vehicle-relative transform prefix parameter */
   void getPrefixParam(void)
@@ -75,8 +75,8 @@ public:
   }
 
 private:
-  std::string prefix_;                /**< vehicle frame prefix */
+  std::string prefix_; /**< vehicle frame prefix */
 };
 };
 
-#endif // _FRAMES_H_
+#endif  // _FRAMES_H_

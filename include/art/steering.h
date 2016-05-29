@@ -21,10 +21,9 @@
 
 namespace Steering
 {
-
 /** Constants: */
-const float steer_speed_min = 3.8;  /* minimum speed for calculation */
-/* (experimentally verified) */
+const float steer_speed_min = 3.8; /* minimum speed for calculation */
+                                   /* (experimentally verified) */
 
 /** Determine steering angle (in degrees) for a given speed and yawrate.
  *
@@ -55,10 +54,8 @@ static inline float steering_angle(float v, float y)
   float steer_radians = atan2f(art_msgs::ArtVehicle::wheelbase * y, v);
   float steer_degrees = angles::to_degrees(steer_radians);
 
-  steer_degrees = fminf(steer_degrees,
-                        art_msgs::ArtVehicle::max_steer_degrees);
-  steer_degrees = fmaxf(steer_degrees,
-                        -art_msgs::ArtVehicle::max_steer_degrees);
+  steer_degrees = fminf(steer_degrees, art_msgs::ArtVehicle::max_steer_degrees);
+  steer_degrees = fmaxf(steer_degrees, -art_msgs::ArtVehicle::max_steer_degrees);
 
   return steer_degrees;
 }
@@ -68,12 +65,10 @@ static inline float steering_angle(float v, float y)
  */
 static inline double angle_to_yaw(double v, float angle)
 {
-  return v * (tanf(angles::from_degrees(angle))
-              / art_msgs::ArtVehicle::wheelbase);
+  return v * (tanf(angles::from_degrees(angle)) / art_msgs::ArtVehicle::wheelbase);
 }
 
-const double maximum_yaw =
-  angle_to_yaw(steer_speed_min, art_msgs::ArtVehicle::max_steer_degrees);
+const double maximum_yaw = angle_to_yaw(steer_speed_min, art_msgs::ArtVehicle::max_steer_degrees);
 }
 
-#endif // _STEERING_H
+#endif  // _STEERING_H
