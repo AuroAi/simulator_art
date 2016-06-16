@@ -259,12 +259,12 @@ void ArtVehicleModel::ModelAcceleration(geometry_msgs::Twist *odomVel, sensor_ms
   // the vehicle idles at 7 MPH (3.1 m/s) with no brake or throttle
   //static const double idle_accel = (rolling_resistance
   //                                  + drag_coeff * 3.1 * 3.1);
-  static const double idle_accel = 0;  //Golf cart actually 0
-  double wind_resistance = drag_coeff * speed * speed;
+  //static const double idle_accel = 0;  //Golf cart actually 0
+ // double wind_resistance = drag_coeff * speed * speed;
 
-  double accel = (idle_accel + throttle_position_ * throttle_accel - brake_position_ * brake_decel - rolling_resistance
-      - wind_resistance);
-
+  //double accel = (idle_accel + throttle_position_ * throttle_accel - brake_position_ * brake_decel - rolling_resistance - wind_resistance);
+  
+  double accel = ( throttle_position_ * throttle_accel - brake_position_ * brake_decel - rolling_resistance );
   // compute seconds since last update (probably zero first time)
   double deltaT = ros::Duration(sim_time - last_update_time_).toSec();
   speed += accel * deltaT;              // adjust speed
