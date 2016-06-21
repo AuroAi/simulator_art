@@ -25,7 +25,7 @@
 
 
 /**  \file
- 
+
      ROS node for simulating the ART autonomous vehicle with Stage..
 
      \todo handle multiple robots (code partially exists from stageros.cpp)
@@ -33,7 +33,7 @@
      \todo map multiple lasers to their own frame and topic names
 
      \todo terminate when stage window terminates
- 
+
      \author Brian Gerkey, Jack O'Quin
 
  */
@@ -146,7 +146,7 @@ class StageNode
 
     // Our callback
     void WorldCallback();
-    
+
     // Do one update of the world.  May pause if the next update time
     // has not yet arrived.
     bool UpdateWorld();
@@ -210,7 +210,7 @@ StageNode::StageNode(int argc, char** argv, bool gui, const char* fname)
   else
     this->world = new Stg::World();
 
-  
+
   // Apparently an Update is needed before the Load to avoid crashes on
   // startup on some systems.
 #if STAGE_VERSION == 3
@@ -236,7 +236,7 @@ StageNode::StageNode(int argc, char** argv, bool gui, const char* fname)
     ROS_BREAK();
 #endif
     size_t numRobots = positionmodels.size();
-    ROS_INFO("found %u position/laser pair%s in the file", 
+    ROS_INFO("found %u position/laser pair%s in the file",
              (unsigned int)numRobots, (numRobots==1) ? "" : "s");
   }
 
@@ -328,14 +328,14 @@ StageNode::WorldCallback()
 
     const std::vector<Stg::ModelRanger::Sensor>& sensors =
       this->lasermodels[r]->GetSensors();
-		
+
     if( sensors.size() > 1 )
       ROS_WARN( "ART Stage currently supports rangers with 1 sensor only." );
 
     // for now we access only the zeroth sensor of the ranger - good
     // enough for most laser models that have a single beam origin
     const Stg::ModelRanger::Sensor& s = sensors[0];
-		
+
     if( s.ranges.size() )
       {
         // Translate into ROS message format and publish
@@ -346,7 +346,7 @@ StageNode::WorldCallback()
         this->laserMsgs[r].range_max = s.range.max;
         this->laserMsgs[r].ranges.resize(s.ranges.size());
         this->laserMsgs[r].intensities.resize(s.intensities.size());
-      		
+
         for(unsigned int i=0; i<s.ranges.size(); i++)
           {
             this->laserMsgs[r].ranges[i] = int(s.ranges[i])==s.range.max?(s.range.max -1):s.ranges[i];//s.ranges[i]
@@ -407,9 +407,9 @@ sigint_handler(int num)
 }
 #endif // STAGE_VERSION 3
 
-int 
+int
 main(int argc, char** argv)
-{ 
+{
   ros::init(argc, argv, "artstage");
 
   ros::NodeHandle private_nh("~");
@@ -443,7 +443,7 @@ main(int argc, char** argv)
 
   StageNode sn(argc-1, argv, gui, world_file.c_str());
 
-  if(sn.SubscribeModels() != 0)	
+  if(sn.SubscribeModels() != 0)
     exit(-1);
 
   // spawn a thread to read incoming ROS messages
@@ -456,7 +456,7 @@ main(int argc, char** argv)
 
   // TODO: get rid of this fixed-duration sleep, using some Stage builtin
   // PauseUntilNextUpdate() functionality.
-  ros::WallRate r(10.0);
+  ros::WallRate r(40.0);
 
   // run stage update loop in the main thread
   while(ros::ok() && !sn.world->TestQuit())

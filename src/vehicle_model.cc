@@ -2,12 +2,12 @@
  *  Copyright (C) 2005, 2007, 2009 Austin Robot Technology
  *
  *  License: Modified BSD Software License Agreement
- * 
+ *
  *  $Id: d5987f2902fa5c61d475348a3bf95e203b11fc84 $
  */
 
 /**  \file
- 
+
  Model speed and turn rate of the ART autonomous vehicle.
 
  \author Jack O'Quin
@@ -15,19 +15,10 @@
  */
 
 #include <angles/angles.h>
-
 #include <art/conversions.h>
 #include <art/frames.h>
 #include <art/UTM.h>
-
-#include <art_msgs/BrakeState.h>
-#include <art_msgs/Shifter.h>
-#include <art_msgs/SteeringState.h>
-#include <art_msgs/ThrottleState.h>
 #include <art/steering.h>
-
-#include <art_msgs/GpsInfo.h>
-
 #include "vehicle_model.h"
 
 void ArtVehicleModel::setup(void)
@@ -38,13 +29,26 @@ void ArtVehicleModel::setup(void)
   odom_pub_ = node_.advertise<nav_msgs::Odometry>(ns_prefix_ + "odom", qDepth);
   ground_truth_pub_ = node_.advertise<nav_msgs::Odometry>(ns_prefix_ + "ground_truth", qDepth);
   imu_pub_ = node_.advertise<sensor_msgs::Imu>(ns_prefix_ + "imu", qDepth);
-  gps_pub_ = node_.advertise<art_msgs::GpsInfo>(ns_prefix_ + "gps", qDepth);
+  gps_pub_ = node_.advertise<sensor_msgs::NavSatFix>(ns_prefix_ + "gps", qDepth);
+  utm_pub_ = node_.advertise<nav_msgs::Odometry>(ns_prefix_ + "utm", qDepth);
 
   ros::NodeHandle private_nh("~");
   private_nh.param("cmd_mode_ackermann", cmd_mode_ackermann, false);
   private_nh.param("latitude", origin_lat_, 29.446018);
   private_nh.param("longitude", origin_long_, -98.607024);
   private_nh.param("elevation", origin_elev_, 100.0);
+  private_nh.param("broadcast_utm_odom", broadcast_utm_odom_, true);
+  private_nh.param("max_accel", max_accel_, 1.2);
+  private_nh.param("max_decl", max_decl_, 3.2);
+  private_nh.param("max_speed", max_speed_, 5.0);
+  private_nh.param("weight", weight_, 700.0);
+  private_nh.param("turning_radius", turning_radius_, 4.6);//4.21999225977
+  private_nh.param("wheelbase", wheelbase_, 2.59);
+  private_nh.param("height", height_, 1.778);
+  private_nh.param("width", width_, 1.397);
+  private_nh.param("length", length_, 3.25);
+  private_nh.param("max_steer_degrees", max_steer_degrees_, 29.0);
+  private_nh.param("max_steer_radians", max_steer_radians_, 0.5061455);
   prev_speed = 0;
   ack_steering_angle = 0;
   ack_steering_angle_velocity = 0;
@@ -91,32 +95,32 @@ void ArtVehicleModel::setup(void)
 // IMPORTANT: These callbacks run in a separate thread, so all class
 // data updates must be done while holding the msg_lock_.
 //
-void ArtVehicleModel::brakeReceived(const art_msgs::BrakeState::ConstPtr &msg)
+void ArtVehicleModel::brakeReceived(const std_msgs::Int32::ConstPtr &msg)
 {
   //ROS_DEBUG("brake state received: position %.3f", msg->position);
   boost::mutex::scoped_lock lock(msg_lock_);
-  brake_position_ = msg->position;
+  brake_position_ = msg->data;
 }
 
-void ArtVehicleModel::shifterReceived(const art_msgs::Shifter::ConstPtr &msg)
+void ArtVehicleModel::shifterReceived(const std_msgs::Int8::ConstPtr &msg)
 {
-  ROS_DEBUG("shifter state received: gear %u", msg->gear);
+  ROS_DEBUG("shifter state received: gear %u", msg->data);
   boost::mutex::scoped_lock lock(msg_lock_);
-  shifter_gear_ = msg->gear;
+  shifter_gear_ = msg->data;
 }
 
-void ArtVehicleModel::steeringReceived(const art_msgs::SteeringState::ConstPtr &msg)
+void ArtVehicleModel::steeringReceived(const std_msgs::Float32::ConstPtr &msg)
 {
-  //ROS_DEBUG("steering state received: %.1f (degrees)", msg->angle);
+  //ROS_DEBUG("steering state received: %.1f (degrees)", msg->data);
   boost::mutex::scoped_lock lock(msg_lock_);
-  steering_angle_ = msg->angle;
+  steering_angle_ = msg->data;
 }
 
-void ArtVehicleModel::throttleReceived(const art_msgs::ThrottleState::ConstPtr &msg)
+void ArtVehicleModel::throttleReceived(const std_msgs::Int32::ConstPtr &msg)
 {
-  //ROS_DEBUG("throttle state received: position %.3f", msg->position);
+  //ROS_DEBUG("throttle state received: position %.3f", msg->data);
   boost::mutex::scoped_lock lock(msg_lock_);
-  throttle_position_ = msg->position;
+  throttle_position_ = msg->data;
 }
 void ArtVehicleModel::ackermannCmdReceived(const ackermann_msgs::AckermannDriveStamped::ConstPtr& msg)
 {
@@ -126,7 +130,7 @@ void ArtVehicleModel::ackermannCmdReceived(const ackermann_msgs::AckermannDriveS
   ack_speed = msg->drive.speed;
   ack_acc = msg->drive.acceleration;
   last_acker_cmd_time_ = msg->header.stamp;
-  //ROS_ERROR_STREAM("ack_speed"<<ack_speed<<" ack_steering_angle"<<ack_steering_angle<<" ack_acc"<<ack_acc<<" ack_steering_angle_velocity"<<ack_steering_angle_velocity);
+  ROS_INFO_STREAM("ackermannCmdReceived:ack_speed"<<ack_speed<<" ack_steering_angle"<<ack_steering_angle<<" ack_acc"<<ack_acc<<" ack_steering_angle_velocity"<<ack_steering_angle_velocity);
 }
 
 void ArtVehicleModel::ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_msgs::Imu *imuMsg, ros::Time sim_time)
@@ -135,27 +139,29 @@ void ArtVehicleModel::ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_
   // MUST serialize with updates from incoming messages
   boost::mutex::scoped_lock lock(msg_lock_);
   //float prev_speed = fabs(odomVel->linear.x);
-  float delta_cmd_T = ros::Duration(sim_time - last_acker_cmd_time_).toSec();
-  if(delta_cmd_T>1)
+  double delta_cmd_T = ros::Duration(sim_time - last_acker_cmd_time_).toSec();
+  if(delta_cmd_T>1.0)
   {
-	  ack_speed=0;
-	  ack_steering_angle=0;
-	  ack_steering_angle_velocity=0;
-	  ack_acc=0;
-	  ROS_ERROR_STREAM_THROTTLE(1,"STAGE ArtVehicle: no ackermannCmd for last Model "<<delta_cmd_T<<" secs resetting commands");
+    ack_speed=0;
+    ack_steering_angle=0;
+    ack_steering_angle_velocity=0;
+    ack_acc=0;
+    ROS_ERROR_STREAM_THROTTLE(1,"STAGE ArtVehicle: no ackermannCmd for last Model "<<delta_cmd_T<<" secs resetting commands");
   }
-  float max_angle = asinf(art_msgs::ArtVehicle::wheelbase / art_msgs::ArtVehicle::turning_radius);
+  ROS_INFO_STREAM_THROTTLE(1,"STAGE ArtVehicle:  ackermannCmd  last  "<<delta_cmd_T<<" secs ");
+  double max_angle = asinf(wheelbase_ / turning_radius_);
 
   // compute seconds since last update (probably zero first time)
-  float deltaT = ros::Duration(sim_time - last_update_time_).toSec();
+  double deltaT = ros::Duration(sim_time - last_update_time_).toSec();
 
-  float accel = (ack_speed - prev_speed) / deltaT;
-  float speed = ack_speed;
-  //ROS_ERROR_STREAM("ack_speed "<<ack_speed<<" prev_speed "<<prev_speed<<" deltaT " <<deltaT<<" accel "<<accel<<std::endl);
-  //ROS_ERROR_STREAM("accel "<<accel<<" ack_acc "<<ack_acc<<" ArtVehicle::max_accel " <<art_msgs::ArtVehicle::max_accel<<" ArtVehicle::max_decl"<<art_msgs::ArtVehicle::max_decl<<std::endl);
-  if (ack_acc > 0)	//ack_acc value is set
+  double accel = (ack_speed - prev_speed) / deltaT;
+  double speed = ack_speed;
+  ROS_ERROR_STREAM("ack_speed "<<ack_speed<<" prev_speed "<<prev_speed<<" deltaT " <<deltaT<<" accel "<<accel<<std::endl);
+  ROS_ERROR_STREAM("accel "<<accel<<" ack_acc "<<ack_acc<<" max_accel_ " <<max_accel_<<" max_decl_"<<max_decl_<<std::endl);
+
+  if (ack_acc > 0)  //ackermann command acceleration limit is set
   {
-    if (accel > 0)	//accelerating
+    if (accel > 0)  //accelerating
     {
       accel = std::min(ack_acc, accel);
     }
@@ -165,38 +171,42 @@ void ArtVehicleModel::ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_
     }
 
   }
-	if(speed>0)
-	{
-	  if (accel > 0) //accelerating
-	  {
-		accel = std::min(art_msgs::ArtVehicle::max_accel, accel);
-	  }
-	  else //decelerating
-	  {
-		accel = std::max(-art_msgs::ArtVehicle::max_decl, accel);
-	  }
-	}else
-	{
-	  if (accel > 0) //decelerating
-	  {
-		accel = std::min(art_msgs::ArtVehicle::max_decl, accel);
-	  }
-	  else //accelerating
-	  {
-		accel = std::max(-art_msgs::ArtVehicle::max_accel, accel);
-	  }
-	}
 
+  ROS_ERROR_STREAM(" ackermann command limit check: accel "<<accel);
 
+  if(speed>0) //forward
+  {
+    if (accel > 0) //accelerating
+    {
+      accel = std::min(max_accel_, accel);
+    }
+    else //decelerating
+    {
+      accel = std::max(-max_decl_, accel);
+    }
+  }else //backward
+  {
+    if (accel > 0) //decelerating
+    {
+      accel = std::min(max_decl_, accel);
+    }
+    else //accelerating
+    {
+      accel = std::max(-max_accel_, accel);
+    }
+  }
+/////////////////////
+accel=0;
+///////////////////////
   speed = prev_speed + accel * deltaT; //*0.999;              // adjust speed by set ack_acc limit
-  //ROS_ERROR_STREAM(" Final accel "<<accel<<" speed "<<speed<<" prev_speed " <<prev_speed<<std::endl);
+  ROS_ERROR_STREAM(" Final accel "<<accel<<" speed "<<speed<<" prev_speed " <<prev_speed<<std::endl);
   if (speed > 0) //forward
   {
-    speed = std::min(art_msgs::ArtVehicle::max_speed, speed);
+    speed = std::min(max_speed_, speed);
   }
   else //backward
   {
-    speed = std::max(-art_msgs::ArtVehicle::max_speed, speed);
+    speed = std::max(max_speed_, speed);
   }
   prev_speed = speed;
   //ROS_ERROR_STREAM("speed "<<speed<<" art_msgs::ArtVehicle::max_speed " <<art_msgs::ArtVehicle::max_speed<<std::endl);
@@ -204,7 +214,7 @@ void ArtVehicleModel::ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_
   odomVel->linear.x = speed;
 
   // set yaw rate (radians/second) from velocity and steering angle
-  odomVel->angular.z = speed * tan(ack_steering_angle) / art_msgs::ArtVehicle::wheelbase;
+  odomVel->angular.z = speed * tan(ack_steering_angle) / wheelbase_;
   imuMsg->angular_velocity.z = odomVel->angular.z;
 
   // set simulated vehicle velocity using the "car" steering model,
@@ -263,7 +273,7 @@ void ArtVehicleModel::ModelAcceleration(geometry_msgs::Twist *odomVel, sensor_ms
  // double wind_resistance = drag_coeff * speed * speed;
 
   //double accel = (idle_accel + throttle_position_ * throttle_accel - brake_position_ * brake_decel - rolling_resistance - wind_resistance);
-  
+
   double accel = ( throttle_position_ * throttle_accel - brake_position_ * brake_decel - rolling_resistance );
   // compute seconds since last update (probably zero first time)
   double deltaT = ros::Duration(sim_time - last_update_time_).toSec();
@@ -280,7 +290,7 @@ void ArtVehicleModel::ModelAcceleration(geometry_msgs::Twist *odomVel, sensor_ms
 
   // Set velocity sign based on gear.
   odomVel->linear.x = speed;            // forward movement
-  if (shifter_gear_ == art_msgs::Shifter::Reverse)
+  if (shifter_gear_ == -1)
     odomVel->linear.x = -speed;         // reverse movement
 
   // set yaw rate (radians/second) from velocity and steering angle
@@ -345,8 +355,8 @@ void ArtVehicleModel::update(ros::Time sim_time)
   // orientation as /earth
  tf::Transform txOdom(tf::Quaternion(0.0, 0.0, 0.0, 1.0), tf::Point( origin_easting_,origin_northing_, 0));
   //ROS_INFO(" sendTransform txOdom earth");
-  tf_->sendTransform(
-      tf::StampedTransform(txOdom, sim_time, "utm", "odom"));
+  if(broadcast_utm_odom_)
+    tf_->sendTransform(tf::StampedTransform(txOdom, sim_time, "utm", "odom"));
 
   // Also publish the ground truth pose and velocity, correcting for
   // Stage's screwed-up coord system.
@@ -382,21 +392,23 @@ void ArtVehicleModel::update(ros::Time sim_time)
 
 void ArtVehicleModel::publishGPS(ros::Time sim_time)
 {
-  art_msgs::GpsInfo gpsi;
+  nav_msgs::Odometry utm_odom_msg;
+  sensor_msgs::NavSatFix gps_msgs;
+  double utm_northing = odomMsg_.pose.pose.position.x  + origin_northing_;
+  double utm_easting = odomMsg_.pose.pose.position.y  + origin_easting_;
 
-  gpsi.header.stamp = sim_time;
-  gpsi.header.frame_id = "utm";
+  utm_odom_msg.header.stamp = sim_time;
+  utm_odom_msg.header.frame_id =  "utm";
+  utm_odom_msg.child_frame_id = "base_link";
+  utm_odom_msg.pose.pose.position.x = utm_easting;
+  utm_odom_msg.pose.pose.position.y = utm_northing;
 
-  // relocate pose relative to map origin
-  gpsi.utm_e = (odomMsg_.pose.pose.position.y  + origin_easting_);
-  gpsi.utm_n = (odomMsg_.pose.pose.position.x  + origin_northing_);
+  gps_msgs.header.stamp = sim_time;
 
-  UTM::UTMtoLL(gpsi.utm_n, gpsi.utm_e, origin_zone_, gpsi.latitude, gpsi.longitude);
+  UTM::UTMtoLL(utm_northing, utm_easting, origin_zone_, gps_msgs.latitude, gps_msgs.longitude);
 
-  gpsi.zone = origin_zone_;
-  gpsi.altitude = 0;//odomMsg_.pose.pose.position.z;
-  gpsi.quality = art_msgs::GpsInfo::DGPS_FIX;
-  gpsi.num_sats = 9;
 
-  gps_pub_.publish(gpsi);
+  utm_pub_.publish(utm_odom_msg);
+  gps_pub_.publish(gps_msgs);
+
 }

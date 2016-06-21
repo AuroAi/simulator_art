@@ -29,20 +29,20 @@
 // ROS interfaces
 #include <ros/ros.h>
 #include <tf/transform_broadcaster.h>
-
-#include <art_msgs/BrakeState.h>
+//#include <gps_common/conversions.h>
+#include <nav_msgs/Odometry.h>
+#include <sensor_msgs/NavSatFix.h>
 #include <sensor_msgs/Imu.h>
 #include <nav_msgs/Odometry.h>
-#include <art_msgs/Shifter.h>
-#include <art_msgs/SteeringState.h>
-#include <art_msgs/ThrottleState.h>
 #include <ackermann_msgs/AckermannDriveStamped.h>
-#include <art_msgs/ArtVehicle.h>
+#include <std_msgs/Int8.h>
+#include <std_msgs/Int32.h>
+#include <std_msgs/Float32.h>
 // Corresponding ROS relative names
-#define BRAKE_STATE "brake/state"
-#define SHIFTER_STATE "shifter/state"
-#define STEERING_STATE "steering/state"
-#define THROTTLE_STATE "throttle/state"
+#define BRAKE_STATE "brake/cmd"
+#define SHIFTER_STATE "shifter/cmd"
+#define STEERING_STATE "steering/cmd"
+#define THROTTLE_STATE "throttle/cmd"
 
 class ArtVehicleModel
 {
@@ -57,7 +57,8 @@ public:
 
     // servo control status
     brake_position_ = 1.0;
-    shifter_gear_ = art_msgs::Shifter::Drive;
+    //shifter_gear_ = art_msgs::Shifter::Drive;
+    shifter_gear_ = 1;
     steering_angle_ = 0.0;
     throttle_position_ = 0.0;
     show_pose_ = false;
@@ -81,6 +82,7 @@ private:
   std::string ns_prefix_;         // vehicle namespace
   std::string tf_prefix_;         // transform ID prefix
 
+
   nav_msgs::Odometry odomMsg_;
   ros::Publisher odom_pub_;
   nav_msgs::Odometry groundTruthMsg_;
@@ -90,6 +92,7 @@ private:
 
   ros::Publisher imu_pub_;
   ros::Publisher gps_pub_;
+  ros::Publisher utm_pub_;
 
   // servo device interfaces
   ros::Subscriber brake_sub_;
@@ -99,10 +102,10 @@ private:
   ros::Subscriber ackermann_sub_;
 
   // servo message callbacks
-  void brakeReceived(const art_msgs::BrakeState::ConstPtr &msg);
-  void shifterReceived(const art_msgs::Shifter::ConstPtr &msg);
-  void steeringReceived(const art_msgs::SteeringState::ConstPtr &msg);
-  void throttleReceived(const art_msgs::ThrottleState::ConstPtr &msg);
+  void brakeReceived(const std_msgs::Int32::ConstPtr &msg);
+  void shifterReceived(const std_msgs::Int8::ConstPtr &msg);
+  void steeringReceived(const std_msgs::Float32::ConstPtr &msg);
+  void throttleReceived(const std_msgs::Int32::ConstPtr &msg);
   void ackermannCmdReceived(const ackermann_msgs::AckermannDriveStamped::ConstPtr &msg);
 
   // servo control status
@@ -110,13 +113,13 @@ private:
   // The mutex serializes access to these fields, which are set by
   // message callbacks running in a separate thread.
   boost::mutex msg_lock_;
-  float brake_position_;
+  double brake_position_;
   uint8_t shifter_gear_;
-  float steering_angle_;
-  float throttle_position_;
+  double steering_angle_;
+  double throttle_position_;
   bool cmd_mode_ackermann;
-  float ack_steering_angle, ack_speed, ack_acc, ack_steering_angle_velocity;
-  float prev_speed;
+  double ack_steering_angle, ack_speed, ack_acc, ack_steering_angle_velocity;
+  double prev_speed;
   void publishGPS(ros::Time sim_time);
 
   double origin_lat_;
@@ -127,8 +130,20 @@ private:
   char origin_zone_[20];
   double map_origin_x_;
   double map_origin_y_;
+  double max_accel_;
+  double max_decl_;
+  double max_speed_;
+  double weight_;
+  double turning_radius_;
+  double wheelbase_;
+  double height_;
+  double width_;
+  double length_;
+  double max_steer_degrees_;
+  double max_steer_radians_;
 
   bool show_pose_;
+  bool broadcast_utm_odom_;
 };
 
 #endif  // _VEHICLE_MODEL_H_
