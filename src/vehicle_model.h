@@ -119,7 +119,7 @@ private:
   double throttle_position_;
   bool cmd_mode_ackermann;
   double ack_steering_angle, ack_speed, ack_acc, ack_steering_angle_velocity;
-  double prev_speed;
+  double prev_speed_,prev_steering_angle_;
   void publishGPS(ros::Time sim_time);
 
   double origin_lat_;
@@ -141,6 +141,7 @@ private:
   double length_;
   double max_steer_degrees_;
   double max_steer_radians_;
+  double max_steering_vel_;
 
   bool show_pose_;
   bool broadcast_utm_odom_;

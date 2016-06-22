@@ -43,13 +43,15 @@ void ArtVehicleModel::setup(void)
   private_nh.param("max_speed", max_speed_, 5.0);
   private_nh.param("weight", weight_, 700.0);
   private_nh.param("turning_radius", turning_radius_, 4.6);//4.21999225977
-  private_nh.param("wheelbase", wheelbase_, 2.59);
+  private_nh.param("wheel_base", wheelbase_, 2.59);
   private_nh.param("height", height_, 1.778);
   private_nh.param("width", width_, 1.397);
   private_nh.param("length", length_, 3.25);
   private_nh.param("max_steer_degrees", max_steer_degrees_, 29.0);
   private_nh.param("max_steer_radians", max_steer_radians_, 0.5061455);
-  prev_speed = 0;
+  private_nh.param("max_steering_vel", max_steering_vel_, 0.6 );
+
+  prev_speed_ = 0;
   ack_steering_angle = 0;
   ack_steering_angle_velocity = 0;
   ack_speed = 0;
@@ -130,7 +132,7 @@ void ArtVehicleModel::ackermannCmdReceived(const ackermann_msgs::AckermannDriveS
   ack_speed = msg->drive.speed;
   ack_acc = msg->drive.acceleration;
   last_acker_cmd_time_ = msg->header.stamp;
-  ROS_INFO_STREAM("ackermannCmdReceived:ack_speed"<<ack_speed<<" ack_steering_angle"<<ack_steering_angle<<" ack_acc"<<ack_acc<<" ack_steering_angle_velocity"<<ack_steering_angle_velocity);
+  //ROS_INFO_STREAM("ackermannCmdReceived:ack_speed"<<ack_speed<<" ack_steering_angle"<<ack_steering_angle<<" ack_acc"<<ack_acc<<" ack_steering_angle_velocity"<<ack_steering_angle_velocity);
 }
 
 void ArtVehicleModel::ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_msgs::Imu *imuMsg, ros::Time sim_time)
@@ -148,16 +150,16 @@ void ArtVehicleModel::ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_
     ack_acc=0;
     ROS_ERROR_STREAM_THROTTLE(1,"STAGE ArtVehicle: no ackermannCmd for last Model "<<delta_cmd_T<<" secs resetting commands");
   }
-  ROS_INFO_STREAM_THROTTLE(1,"STAGE ArtVehicle:  ackermannCmd  last  "<<delta_cmd_T<<" secs ");
+  //ROS_INFO_STREAM_THROTTLE(1,"STAGE ArtVehicle:  ackermannCmd  last  "<<delta_cmd_T<<" secs ");
   double max_angle = asinf(wheelbase_ / turning_radius_);
 
   // compute seconds since last update (probably zero first time)
   double deltaT = ros::Duration(sim_time - last_update_time_).toSec();
 
-  double accel = (ack_speed - prev_speed) / deltaT;
+  double accel = (ack_speed - prev_speed_) / deltaT;
   double speed = ack_speed;
-  ROS_ERROR_STREAM("ack_speed "<<ack_speed<<" prev_speed "<<prev_speed<<" deltaT " <<deltaT<<" accel "<<accel<<std::endl);
-  ROS_ERROR_STREAM("accel "<<accel<<" ack_acc "<<ack_acc<<" max_accel_ " <<max_accel_<<" max_decl_"<<max_decl_<<std::endl);
+  //ROS_ERROR_STREAM("ack_speed "<<ack_speed<<" prev_speed "<<prev_speed_<<" deltaT " <<deltaT<<" accel "<<accel<<std::endl);
+  //ROS_ERROR_STREAM("accel "<<accel<<" ack_acc "<<ack_acc<<" max_accel_ " <<max_accel_<<" max_decl_"<<max_decl_<<std::endl);
 
   if (ack_acc > 0)  //ackermann command acceleration limit is set
   {
@@ -172,11 +174,11 @@ void ArtVehicleModel::ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_
 
   }
 
-  ROS_ERROR_STREAM(" ackermann command limit check: accel "<<accel);
+  //ROS_ERROR_STREAM(" ackermann command limit check: accel "<<accel);
 
-  if(speed>0) //forward
+  if(speed>=0) //forward
   {
-    if (accel > 0) //accelerating
+    if (accel >= 0) //accelerating
     {
       accel = std::min(max_accel_, accel);
     }
@@ -186,7 +188,7 @@ void ArtVehicleModel::ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_
     }
   }else //backward
   {
-    if (accel > 0) //decelerating
+    if (accel >= 0) //decelerating
     {
       accel = std::min(max_decl_, accel);
     }
@@ -195,11 +197,9 @@ void ArtVehicleModel::ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_
       accel = std::max(-max_accel_, accel);
     }
   }
-/////////////////////
-//accel=0;
-///////////////////////
-  speed = prev_speed + accel * deltaT; //*0.999;              // adjust speed by set ack_acc limit
-  ROS_ERROR_STREAM(" Final accel "<<accel<<" speed "<<speed<<" prev_speed " <<prev_speed<<std::endl);
+
+  speed = prev_speed_ + accel * deltaT; //*0.999;              // adjust speed by set ack_acc limit
+  //ROS_ERROR_STREAM(" Final accel "<<accel<<" speed "<<speed<<" prev_speed " <<prev_speed_<<std::endl);
   if (speed >= 0) //forward
   {
     speed = std::min(max_speed_, speed);
@@ -208,17 +208,13 @@ void ArtVehicleModel::ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_
   {
     speed = std::max(-max_speed_, speed);
   }
-  prev_speed = speed;
+  prev_speed_ = speed;
   //ROS_ERROR_STREAM("speed "<<speed<<" art_msgs::ArtVehicle::max_speed " <<art_msgs::ArtVehicle::max_speed<<std::endl);
-  imuMsg->linear_acceleration.x = accel;
-  odomVel->linear.x = speed;
 
-  // set yaw rate (radians/second) from velocity and steering angle
-  odomVel->angular.z = speed * tan(ack_steering_angle) / wheelbase_;
-  imuMsg->angular_velocity.z = odomVel->angular.z;
 
-  // set simulated vehicle velocity using the "car" steering model,
-  // which uses steering angle in radians instead of yaw rate.
+
+
+
   if (ack_steering_angle > 0)
   {
     steering_angle_ = std::min(max_angle, ack_steering_angle);
@@ -227,6 +223,42 @@ void ArtVehicleModel::ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_
   {
     steering_angle_ = std::max(-max_angle, ack_steering_angle);
   }
+
+  double steering_vel = (steering_angle_ - prev_steering_angle_) / deltaT;
+
+  if (ack_steering_angle_velocity > 0)  //ackermann command ack_steering_angle_velocity limit is set
+    {
+      if (steering_vel > 0)
+      {
+        steering_vel = std::min(ack_steering_angle_velocity, steering_vel);
+      }
+      else
+      {
+        steering_vel = std::max(-ack_steering_angle_velocity, steering_vel);
+      }
+
+    }
+
+    //ROS_ERROR_STREAM(" ack_steering_angle_velocity command limit check: steering_vel "<<steering_vel);
+
+    if (steering_vel > 0)
+    {
+      steering_vel = std::min(max_steering_vel_, steering_vel);
+    }
+    else
+    {
+      steering_vel = std::max(-max_steering_vel_, steering_vel);
+    }
+
+  prev_steering_angle_ = steering_angle_;
+
+  // set simulated vehicle velocity using the "car" steering model,
+  // which uses steering angle in radians instead of yaw rate.
+  // set yaw rate (radians/second) from velocity and steering angle
+  odomVel->linear.x = speed;
+  odomVel->angular.z = speed * tan(steering_angle_) / wheelbase_;
+  imuMsg->linear_acceleration.x = accel;
+  imuMsg->angular_velocity.z = odomVel->angular.z;
 
   ROS_DEBUG("Stage SetSpeed(%.3f, %.3f, %.3f)", odomVel->linear.x, odomVel->linear.y, ack_steering_angle);
   stgp_->SetSpeed(odomVel->linear.x, odomVel->linear.y, ack_steering_angle);
