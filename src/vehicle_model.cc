@@ -196,17 +196,17 @@ void ArtVehicleModel::ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_
     }
   }
 /////////////////////
-accel=0;
+//accel=0;
 ///////////////////////
   speed = prev_speed + accel * deltaT; //*0.999;              // adjust speed by set ack_acc limit
   ROS_ERROR_STREAM(" Final accel "<<accel<<" speed "<<speed<<" prev_speed " <<prev_speed<<std::endl);
-  if (speed > 0) //forward
+  if (speed >= 0) //forward
   {
     speed = std::min(max_speed_, speed);
   }
   else //backward
   {
-    speed = std::max(max_speed_, speed);
+    speed = std::max(-max_speed_, speed);
   }
   prev_speed = speed;
   //ROS_ERROR_STREAM("speed "<<speed<<" art_msgs::ArtVehicle::max_speed " <<art_msgs::ArtVehicle::max_speed<<std::endl);
