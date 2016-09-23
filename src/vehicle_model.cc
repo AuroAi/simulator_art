@@ -33,6 +33,7 @@ void ArtVehicleModel::setup(void)
   utm_pub_ = node_.advertise<nav_msgs::Odometry>(ns_prefix_ + "utm", qDepth);
   steer_angle_pub_ = node_.advertise<std_msgs::Float32>(ns_prefix_ + "steer_angle", 1);
   steer_vel_pub_ = node_.advertise<std_msgs::Float32>(ns_prefix_ + "steer_vel", 1);
+  veh_info_pub_ = node_.advertise<auro_vehicle_msgs::VehicleInfo>(ns_prefix_ + "vehicle_info", 1);
 
   ros::NodeHandle private_nh("~");
   private_nh.param("cmd_mode_ackermann", cmd_mode_ackermann, false);
@@ -268,6 +269,10 @@ void ArtVehicleModel::ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_
   steer_angle_pub_.publish(steer_angle_msg_);
   steer_vel_msg_.data=fabs(steering_vel);
   steer_vel_pub_.publish(steer_vel_msg_);
+
+  veh_info_msg_.steer.steer_angle=steering_angle_;
+  veh_info_msg_.steer.steer_velocity=fabs(steering_vel);
+  veh_info_pub_.publish(veh_info_msg_);
 
 
 

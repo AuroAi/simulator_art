@@ -38,6 +38,8 @@
 #include <std_msgs/Int8.h>
 #include <std_msgs/Int32.h>
 #include <std_msgs/Float32.h>
+#include <auro_vehicle_msgs/VehicleInfo.h>
+
 // Corresponding ROS relative names
 #define BRAKE_STATE "brake/cmd"
 #define SHIFTER_STATE "shifter/cmd"
@@ -83,6 +85,7 @@ private:
   std::string tf_prefix_;         // transform ID prefix
 
   std_msgs::Float32 steer_angle_msg_,steer_vel_msg_;
+  auro_vehicle_msgs::VehicleInfo veh_info_msg_;
   nav_msgs::Odometry odomMsg_;
   ros::Publisher odom_pub_;
   nav_msgs::Odometry groundTruthMsg_;
@@ -95,6 +98,7 @@ private:
   ros::Publisher utm_pub_;
   ros::Publisher steer_angle_pub_;
   ros::Publisher steer_vel_pub_;
+  ros::Publisher veh_info_pub_;
 
   // servo device interfaces
   ros::Subscriber brake_sub_;
