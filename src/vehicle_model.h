@@ -82,7 +82,7 @@ private:
   std::string ns_prefix_;         // vehicle namespace
   std::string tf_prefix_;         // transform ID prefix
 
-
+  std_msgs::Float32 steer_angle_msg_,steer_vel_msg_;
   nav_msgs::Odometry odomMsg_;
   ros::Publisher odom_pub_;
   nav_msgs::Odometry groundTruthMsg_;
@@ -93,6 +93,8 @@ private:
   ros::Publisher imu_pub_;
   ros::Publisher gps_pub_;
   ros::Publisher utm_pub_;
+  ros::Publisher steer_angle_pub_;
+  ros::Publisher steer_vel_pub_;
 
   // servo device interfaces
   ros::Subscriber brake_sub_;

@@ -31,6 +31,8 @@ void ArtVehicleModel::setup(void)
   imu_pub_ = node_.advertise<sensor_msgs::Imu>(ns_prefix_ + "imu", qDepth);
   gps_pub_ = node_.advertise<sensor_msgs::NavSatFix>(ns_prefix_ + "gps", qDepth);
   utm_pub_ = node_.advertise<nav_msgs::Odometry>(ns_prefix_ + "utm", qDepth);
+  steer_angle_pub_ = node_.advertise<std_msgs::Float32>(ns_prefix_ + "steer_angle", 1);
+  steer_vel_pub_ = node_.advertise<std_msgs::Float32>(ns_prefix_ + "steer_vel", 1);
 
   ros::NodeHandle private_nh("~");
   private_nh.param("cmd_mode_ackermann", cmd_mode_ackermann, false);
@@ -250,6 +252,7 @@ void ArtVehicleModel::ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_
       steering_vel = std::max(-max_steering_vel_, steering_vel);
     }
 
+  steering_angle_ = prev_steering_angle_ + steering_vel * deltaT;
   prev_steering_angle_ = steering_angle_;
 
   // set simulated vehicle velocity using the "car" steering model,
@@ -260,8 +263,17 @@ void ArtVehicleModel::ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_
   imuMsg->linear_acceleration.x = accel;
   imuMsg->angular_velocity.z = odomVel->angular.z;
 
+  //publish steering data
+  steer_angle_msg_.data=steering_angle_;
+  steer_angle_pub_.publish(steer_angle_msg_);
+  steer_vel_msg_.data=fabs(steering_vel);
+  steer_vel_pub_.publish(steer_vel_msg_);
+
+
+
   ROS_DEBUG("Stage SetSpeed(%.3f, %.3f, %.3f)", odomVel->linear.x, odomVel->linear.y, ack_steering_angle);
   stgp_->SetSpeed(odomVel->linear.x, odomVel->linear.y, ack_steering_angle);
+
   //Int Stage position modle implementation for  drive_mode = DRIVE_CAR
   //vel.x = goal.x * cos(goal.a);
   //vel.y = 0;
