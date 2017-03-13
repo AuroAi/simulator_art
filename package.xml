@@ -36,7 +36,6 @@
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>boost</run_depend>
-  <run_depend>fluid</run_depend>
   <run_depend>angles</run_depend>
   <run_depend>geometry_msgs</run_depend>
   <run_depend>ackermann_msgs</run_depend>
