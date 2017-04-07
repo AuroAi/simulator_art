@@ -41,7 +41,6 @@
   <run_depend>ackermann_msgs</run_depend>
   <run_depend>auro_vehicle_msgs</run_depend>
   <run_depend>nav_msgs</run_depend>
-  <run_depend>pcl</run_depend>
   <run_depend>pcl_msgs</run_depend>
   <run_depend>pcl_ros</run_depend>
   <run_depend>pcl_conversions</run_depend>
