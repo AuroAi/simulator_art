@@ -99,7 +99,6 @@ private:
   auro_vehicle_msgs::VehicleInfo veh_info_msg_;
   //nav_msgs::Odometry odomMsg_;
   ros::Publisher odom_pub_;
-  nav_msgs::Odometry groundTruthMsg_;
   ros::Publisher ground_truth_pub_;
   ros::Time last_update_time_;
   ros::Time last_acker_cmd_time_;
@@ -139,7 +138,7 @@ private:
   double ack_steering_angle, ack_speed, ack_acc, ack_steering_angle_velocity;
   double prev_speed_,prev_steering_angle_;
   void publishGPS(ros::Time sim_time,nav_msgs::Odometry odom);
-  void publishUpdate();
+  void publishUpdate(ros::Time time_latest);
   void publishSetUpdate(ros::Time sim_time,geometry_msgs::Twist twist,sensor_msgs::Imu imu);
 
   double origin_lat_;

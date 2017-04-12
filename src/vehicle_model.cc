@@ -219,9 +219,6 @@ void ArtVehicleModel::ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_
   //ROS_ERROR_STREAM("speed "<<speed<<" art_msgs::ArtVehicle::max_speed " <<art_msgs::ArtVehicle::max_speed<<std::endl);
 
 
-
-
-
   if (ack_steering_angle > 0)
   {
     steering_angle_ = std::min(max_angle, ack_steering_angle);
@@ -363,7 +360,7 @@ void ArtVehicleModel::update(ros::Time sim_time)
   }
 
   publishSetUpdate(sim_time,twist,imu);
-  publishUpdate();
+  publishUpdate(sim_time);
   last_update_time_ = sim_time;
 }
 void ArtVehicleModel::publishSetUpdate(ros::Time sim_time,geometry_msgs::Twist twist,sensor_msgs::Imu imu)
@@ -386,13 +383,9 @@ void ArtVehicleModel::publishSetUpdate(ros::Time sim_time,geometry_msgs::Twist t
   state_info_new.odom.pose.pose.position.y = stgp_->est_pose.y;//stgp_->est_pose.y + map_origin_y_;
   state_info_new.odom.pose.pose.position.z = 0;//origin_elev_;
   state_info_new.odom.pose.pose.orientation = tf::createQuaternionMsgFromYaw(stgp_->est_pose.a);
-  state_info_new.odom.header.stamp = sim_time;
-  state_info_new.odom.header.frame_id = "odom";
-  state_info_new.odom.child_frame_id = "base_link";
+
 
   state_info_new.imu=imu;
-  state_info_new.imu.header.stamp = sim_time;
-  state_info_new.imu.header.frame_id = "base_link";
   state_info_new.imu.orientation = state_info_new.odom.pose.pose.orientation;
 
 
@@ -417,19 +410,20 @@ void ArtVehicleModel::publishSetUpdate(ros::Time sim_time,geometry_msgs::Twist t
   state_info_new.groundTruth.twist.twist.linear.x = gv.getOrigin().x();
   state_info_new.groundTruth.twist.twist.linear.y = gv.getOrigin().y();
   state_info_new.groundTruth.twist.twist.angular.z = gvel.a;
-  state_info_new.groundTruth.header.stamp = sim_time;
-  state_info_new.groundTruth.header.frame_id = "odom_truth";
-  state_info_new.groundTruth.child_frame_id = "base_link";
 
   state_info_buffer_.push_back(state_info_new);
 }
 
-void ArtVehicleModel::publishUpdate()
+void ArtVehicleModel::publishUpdate(ros::Time time_latest)
 {
   struct state_info state_info_old=state_info_buffer_[0];
   sensor_msgs::Imu imu_msg;
-  nav_msgs::Odometry odom_msg;
-  ros::Time sim_time=state_info_buffer_[0].sim_time;
+  nav_msgs::Odometry odom_msg,groundTruthMsg;
+  ros::Time sim_time;
+  //sim_time=state_info_buffer_[0].sim_time;
+  sim_time=time_latest;
+
+  ROS_DEBUG_STREAM("state_info_buffer_full()"<<state_info_buffer_.full()<<" size "<<state_info_buffer_.size()<<" capacity "<<state_info_buffer_.capacity());
 
   if (cmd_mode_ackermann == true)
    {
@@ -445,15 +439,24 @@ void ArtVehicleModel::publishUpdate()
    }
 
   odom_msg= state_info_old.odom;
+  odom_msg.header.stamp=sim_time;
+  odom_msg.header.frame_id = "odom";
+  odom_msg.child_frame_id = "base_link";
   odom_pub_.publish(odom_msg);
 
   // publish simulated IMU data
 
-
+  imu_msg.header.stamp=sim_time;
+  imu_msg.header.frame_id = "base_link";
   imu_pub_.publish(imu_msg);
 
-  groundTruthMsg_ = state_info_old.groundTruth;
-  ground_truth_pub_.publish(groundTruthMsg_);
+  groundTruthMsg = state_info_old.groundTruth;
+  groundTruthMsg.header.stamp = sim_time;
+  groundTruthMsg.header.frame_id = "odom_truth";
+  groundTruthMsg.child_frame_id = "base_link";
+
+  ground_truth_pub_.publish(groundTruthMsg);
+
 
   // broadcast /earth transform relative to sea level
   tf::Quaternion vehicleQ;
