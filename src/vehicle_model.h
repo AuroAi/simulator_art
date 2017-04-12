@@ -22,6 +22,7 @@
 #include <math.h>
 #include <iostream>
 #include <boost/thread/mutex.hpp>
+#include <boost/circular_buffer.hpp>
 
 // libstage
 #include <stage.hh>
@@ -45,6 +46,16 @@
 #define SHIFTER_STATE "shifter/cmd"
 #define STEERING_STATE "steering/cmd"
 #define THROTTLE_STATE "throttle/cmd"
+
+struct state_info
+{
+  ros::Time sim_time;
+  double steering_vel;
+  double steering_angle;
+  nav_msgs::Odometry odom;
+  nav_msgs::Odometry groundTruth;
+  sensor_msgs::Imu imu;
+};
 
 class ArtVehicleModel
 {
@@ -86,7 +97,7 @@ private:
 
   std_msgs::Float32 steer_angle_msg_,steer_vel_msg_;
   auro_vehicle_msgs::VehicleInfo veh_info_msg_;
-  nav_msgs::Odometry odomMsg_;
+  //nav_msgs::Odometry odomMsg_;
   ros::Publisher odom_pub_;
   nav_msgs::Odometry groundTruthMsg_;
   ros::Publisher ground_truth_pub_;
@@ -122,11 +133,14 @@ private:
   double brake_position_;
   uint8_t shifter_gear_;
   double steering_angle_;
+  double steering_vel_;
   double throttle_position_;
   bool cmd_mode_ackermann;
   double ack_steering_angle, ack_speed, ack_acc, ack_steering_angle_velocity;
   double prev_speed_,prev_steering_angle_;
-  void publishGPS(ros::Time sim_time);
+  void publishGPS(ros::Time sim_time,nav_msgs::Odometry odom);
+  void publishUpdate();
+  void publishSetUpdate(ros::Time sim_time,geometry_msgs::Twist twist,sensor_msgs::Imu imu);
 
   double origin_lat_;
   double origin_long_;
@@ -148,6 +162,11 @@ private:
   double max_steer_degrees_;
   double max_steer_radians_;
   double max_steering_vel_;
+  int delay_location_steps_;
+
+
+  boost::circular_buffer<state_info> state_info_buffer_;
+
 
   bool show_pose_;
   bool broadcast_utm_odom_;

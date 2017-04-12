@@ -53,6 +53,10 @@ void ArtVehicleModel::setup(void)
   private_nh.param("max_steer_degrees", max_steer_degrees_, 29.0);
   private_nh.param("max_steer_radians", max_steer_radians_, 0.5061455);
   private_nh.param("max_steering_vel", max_steering_vel_, 0.6 );
+  private_nh.param("delay_location_steps", delay_location_steps_, 1 );
+  if(delay_location_steps_<1)delay_location_steps_=1;
+  state_info_buffer_.set_capacity(delay_location_steps_);
+
 
   prev_speed_ = 0;
   ack_steering_angle = 0;
@@ -227,33 +231,33 @@ void ArtVehicleModel::ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_
     steering_angle_ = std::max(-max_angle, ack_steering_angle);
   }
 
-  double steering_vel = (steering_angle_ - prev_steering_angle_) / deltaT;
+   steering_vel_ = (steering_angle_ - prev_steering_angle_) / deltaT;
 
-  if (ack_steering_angle_velocity > 0)  //ackermann command ack_steering_angle_velocity limit is set
+   if (ack_steering_angle_velocity > 0)  //ackermann command ack_steering_angle_velocity limit is set
     {
-      if (steering_vel > 0)
+      if (steering_vel_ > 0)
       {
-        steering_vel = std::min(ack_steering_angle_velocity, steering_vel);
+        steering_vel_ = std::min(ack_steering_angle_velocity, steering_vel_);
       }
       else
       {
-        steering_vel = std::max(-ack_steering_angle_velocity, steering_vel);
+        steering_vel_ = std::max(-ack_steering_angle_velocity, steering_vel_);
       }
 
     }
 
     //ROS_ERROR_STREAM(" ack_steering_angle_velocity command limit check: steering_vel "<<steering_vel);
 
-    if (steering_vel > 0)
+    if (steering_vel_ > 0)
     {
-      steering_vel = std::min(max_steering_vel_, steering_vel);
+      steering_vel_ = std::min(max_steering_vel_, steering_vel_);
     }
     else
     {
-      steering_vel = std::max(-max_steering_vel_, steering_vel);
+      steering_vel_ = std::max(-max_steering_vel_, steering_vel_);
     }
 
-  steering_angle_ = prev_steering_angle_ + steering_vel * deltaT;
+  steering_angle_ = prev_steering_angle_ + steering_vel_ * deltaT;
   prev_steering_angle_ = steering_angle_;
 
   // set simulated vehicle velocity using the "car" steering model,
@@ -263,18 +267,6 @@ void ArtVehicleModel::ackermannCmdControl(geometry_msgs::Twist *odomVel, sensor_
   odomVel->angular.z = speed * tan(steering_angle_) / wheelbase_;
   imuMsg->linear_acceleration.x = accel;
   imuMsg->angular_velocity.z = odomVel->angular.z;
-
-  //publish steering data
-  steer_angle_msg_.data=steering_angle_;
-  steer_angle_pub_.publish(steer_angle_msg_);
-  steer_vel_msg_.data=fabs(steering_vel);
-  steer_vel_pub_.publish(steer_vel_msg_);
-
-  veh_info_msg_.steer.steer_angle=steering_angle_;
-  veh_info_msg_.steer.steer_velocity=fabs(steering_vel);
-  veh_info_pub_.publish(veh_info_msg_);
-
-
 
   ROS_DEBUG("Stage SetSpeed(%.3f, %.3f, %.3f)", odomVel->linear.x, odomVel->linear.y, ack_steering_angle);
   stgp_->SetSpeed(odomVel->linear.x, odomVel->linear.y, ack_steering_angle);
@@ -357,55 +349,52 @@ void ArtVehicleModel::ModelAcceleration(geometry_msgs::Twist *odomVel, sensor_ms
 // update vehicle dynamics model
 void ArtVehicleModel::update(ros::Time sim_time)
 {
-  sensor_msgs::Imu imu_msg;
+  geometry_msgs::Twist twist;
+  sensor_msgs::Imu imu;
 
   // model vehicle acceleration from servo actuators
   if (cmd_mode_ackermann == true)
   {
-    ackermannCmdControl(&odomMsg_.twist.twist, &imu_msg, sim_time);
+    ackermannCmdControl(&twist, &imu, sim_time);
   }
   else
   {
-    ModelAcceleration(&odomMsg_.twist.twist, &imu_msg, sim_time);
+    ModelAcceleration(&twist, &imu, sim_time);
   }
 
+  publishSetUpdate(sim_time,twist,imu);
+  publishUpdate();
+  last_update_time_ = sim_time;
+}
+void ArtVehicleModel::publishSetUpdate(ros::Time sim_time,geometry_msgs::Twist twist,sensor_msgs::Imu imu)
+{
+  struct state_info state_info_new;
+
+  state_info_new.sim_time=sim_time;
+
+  if (cmd_mode_ackermann == true)
+   {
+    state_info_new.steering_vel=steering_vel_;
+    state_info_new.steering_angle=steering_angle_;
+   }
+
+
   // Get latest position data from Stage
-  // Translate into ROS message format and publish
-  odomMsg_.pose.pose.position.x = stgp_->est_pose.x;//stgp_->est_pose.x + map_origin_x_;
-  odomMsg_.pose.pose.position.y = stgp_->est_pose.y;//stgp_->est_pose.y + map_origin_y_;
-  odomMsg_.pose.pose.position.z = 0;//origin_elev_;
-  odomMsg_.pose.pose.orientation = tf::createQuaternionMsgFromYaw(stgp_->est_pose.a);
+   // Translate into ROS message format and publish
+  state_info_new.odom.twist.twist=twist;
+  state_info_new.odom.pose.pose.position.x = stgp_->est_pose.x;//stgp_->est_pose.x + map_origin_x_;
+  state_info_new.odom.pose.pose.position.y = stgp_->est_pose.y;//stgp_->est_pose.y + map_origin_y_;
+  state_info_new.odom.pose.pose.position.z = 0;//origin_elev_;
+  state_info_new.odom.pose.pose.orientation = tf::createQuaternionMsgFromYaw(stgp_->est_pose.a);
+  state_info_new.odom.header.stamp = sim_time;
+  state_info_new.odom.header.frame_id = "odom";
+  state_info_new.odom.child_frame_id = "base_link";
 
-  odomMsg_.header.stamp = sim_time;
-  odomMsg_.header.frame_id = "odom";
-  odomMsg_.child_frame_id = "base_link";
-  odom_pub_.publish(odomMsg_);
+  state_info_new.imu=imu;
+  state_info_new.imu.header.stamp = sim_time;
+  state_info_new.imu.header.frame_id = "base_link";
+  state_info_new.imu.orientation = state_info_new.odom.pose.pose.orientation;
 
-  // publish simulated IMU data
-  imu_msg.header.stamp = sim_time;
-  imu_msg.header.frame_id = "base_link";
-  imu_msg.orientation = odomMsg_.pose.pose.orientation;
-  imu_pub_.publish(imu_msg);
-
-  // broadcast /earth transform relative to sea level
-  tf::Quaternion vehicleQ;
-  tf::quaternionMsgToTF(odomMsg_.pose.pose.orientation, vehicleQ);
-  //ROS_INFO(" sendTransform txEarth");
-  //tf::Transform txEarth(
-  //    vehicleQ, tf::Point(odomMsg_.pose.pose.position.x, odomMsg_.pose.pose.position.y, odomMsg_.pose.pose.position.z));
-  tf::Transform txEarth(
-      vehicleQ, tf::Point( odomMsg_.pose.pose.position.x  , odomMsg_.pose.pose.position.y ,0));
-  //    vehicleQ, tf::Point(odomMsg_.pose.pose.position.x- map_origin_x_ + origin_easting_, odomMsg_.pose.pose.position.y - map_origin_y_ + origin_northing_, 0));
-
-  tf_->sendTransform(
-      tf::StampedTransform(txEarth, sim_time, "odom", "base_link"));
-
-  // Also publish /odom frame with same elevation as /vehicle and same
-  // orientation as /earth
- tf::Transform txOdom(tf::Quaternion(0.0, 0.0, 0.0, 1.0), tf::Point( origin_easting_,origin_northing_, 0));
-  //ROS_INFO(" sendTransform txOdom earth");
-  if(broadcast_utm_odom_)
-    tf_->sendTransform(tf::StampedTransform(txOdom, sim_time, "utm", "odom"));
 
   // Also publish the ground truth pose and velocity, correcting for
   // Stage's screwed-up coord system.
@@ -418,33 +407,83 @@ void ArtVehicleModel::update(ros::Time sim_time)
   tf::Quaternion gvelQ;
   gvelQ.setRPY(0.0, 0.0, gvel.a - M_PI / 2.0);
   tf::Transform gv(gvelQ, tf::Point(gvel.y, -gvel.x, 0.0));
+  state_info_new.groundTruth.pose.pose.position.x = gt.getOrigin().x();
+  state_info_new.groundTruth.pose.pose.position.y = gt.getOrigin().y();
+  state_info_new.groundTruth.pose.pose.position.z = gt.getOrigin().z();
+  state_info_new.groundTruth.pose.pose.orientation.x = gt.getRotation().x();
+  state_info_new.groundTruth.pose.pose.orientation.y = gt.getRotation().y();
+  state_info_new.groundTruth.pose.pose.orientation.z = gt.getRotation().z();
+  state_info_new.groundTruth.pose.pose.orientation.w = gt.getRotation().w();
+  state_info_new.groundTruth.twist.twist.linear.x = gv.getOrigin().x();
+  state_info_new.groundTruth.twist.twist.linear.y = gv.getOrigin().y();
+  state_info_new.groundTruth.twist.twist.angular.z = gvel.a;
+  state_info_new.groundTruth.header.stamp = sim_time;
+  state_info_new.groundTruth.header.frame_id = "odom_truth";
+  state_info_new.groundTruth.child_frame_id = "base_link";
 
-  groundTruthMsg_.pose.pose.position.x = gt.getOrigin().x();
-  groundTruthMsg_.pose.pose.position.y = gt.getOrigin().y();
-  groundTruthMsg_.pose.pose.position.z = gt.getOrigin().z();
-  groundTruthMsg_.pose.pose.orientation.x = gt.getRotation().x();
-  groundTruthMsg_.pose.pose.orientation.y = gt.getRotation().y();
-  groundTruthMsg_.pose.pose.orientation.z = gt.getRotation().z();
-  groundTruthMsg_.pose.pose.orientation.w = gt.getRotation().w();
-  groundTruthMsg_.twist.twist.linear.x = gv.getOrigin().x();
-  groundTruthMsg_.twist.twist.linear.y = gv.getOrigin().y();
-  groundTruthMsg_.twist.twist.angular.z = gvel.a;
-  groundTruthMsg_.header.stamp = sim_time;
-  groundTruthMsg_.header.frame_id = "odom_truth";
-  groundTruthMsg_.child_frame_id = "base_link";
-  ground_truth_pub_.publish(groundTruthMsg_);
-
-  publishGPS(sim_time);
-
-  last_update_time_ = sim_time;
+  state_info_buffer_.push_back(state_info_new);
 }
 
-void ArtVehicleModel::publishGPS(ros::Time sim_time)
+void ArtVehicleModel::publishUpdate()
+{
+  struct state_info state_info_old=state_info_buffer_[0];
+  sensor_msgs::Imu imu_msg;
+  nav_msgs::Odometry odom_msg;
+  ros::Time sim_time=state_info_buffer_[0].sim_time;
+
+  if (cmd_mode_ackermann == true)
+   {
+    //publish steering data
+    steer_angle_msg_.data=state_info_old.steering_angle;
+    steer_angle_pub_.publish(steer_angle_msg_);
+    steer_vel_msg_.data=fabs(state_info_old.steering_vel);
+    steer_vel_pub_.publish(steer_vel_msg_);
+
+    veh_info_msg_.steer.steer_angle=state_info_old.steering_angle;
+    veh_info_msg_.steer.steer_velocity=fabs(state_info_old.steering_vel);
+    veh_info_pub_.publish(veh_info_msg_);
+   }
+
+  odom_msg= state_info_old.odom;
+  odom_pub_.publish(odom_msg);
+
+  // publish simulated IMU data
+
+
+  imu_pub_.publish(imu_msg);
+
+  groundTruthMsg_ = state_info_old.groundTruth;
+  ground_truth_pub_.publish(groundTruthMsg_);
+
+  // broadcast /earth transform relative to sea level
+  tf::Quaternion vehicleQ;
+  tf::quaternionMsgToTF(odom_msg.pose.pose.orientation, vehicleQ);
+  //ROS_INFO(" sendTransform txEarth");
+  //tf::Transform txEarth(
+  //    vehicleQ, tf::Point(odom_msg.pose.pose.position.x, odom_msg.pose.pose.position.y, odom_msg.pose.pose.position.z));
+  tf::Transform txEarth(
+      vehicleQ, tf::Point( odom_msg.pose.pose.position.x  , odom_msg.pose.pose.position.y ,0));
+  //    vehicleQ, tf::Point(odom_msg.pose.pose.position.x- map_origin_x_ + origin_easting_, odom_msg.pose.pose.position.y - map_origin_y_ + origin_northing_, 0));
+
+  tf_->sendTransform(
+      tf::StampedTransform(txEarth, sim_time, "odom", "base_link"));
+
+  // Also publish /odom frame with same elevation as /vehicle and same
+  // orientation as /earth
+ tf::Transform txOdom(tf::Quaternion(0.0, 0.0, 0.0, 1.0), tf::Point( origin_easting_,origin_northing_, 0));
+  //ROS_INFO(" sendTransform txOdom earth");
+  if(broadcast_utm_odom_)
+    tf_->sendTransform(tf::StampedTransform(txOdom, sim_time, "utm", "odom"));
+
+  publishGPS(sim_time,odom_msg);
+}
+
+void ArtVehicleModel::publishGPS(ros::Time sim_time,nav_msgs::Odometry odom)
 {
   nav_msgs::Odometry utm_odom_msg;
   sensor_msgs::NavSatFix gps_msgs;
-  double utm_northing = odomMsg_.pose.pose.position.x  + origin_northing_;
-  double utm_easting = odomMsg_.pose.pose.position.y  + origin_easting_;
+  double utm_northing = odom.pose.pose.position.x  + origin_northing_;
+  double utm_easting = odom.pose.pose.position.y  + origin_easting_;
 
   utm_odom_msg.header.stamp = sim_time;
   utm_odom_msg.header.frame_id =  "utm";
