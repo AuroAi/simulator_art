@@ -46,6 +46,14 @@ target_link_libraries(artstage
   ${FLTK_LIBRARIES}
   ${Stage_LIBRARIES}  -ldl)
 
+# new, improved simulation
+add_executable(stageros src/stageros.cc src/vehicle_model.cc)
+target_link_libraries(stageros
+  ${catkin_LIBRARIES}
+  ${Boost_LIBRARIES}
+  ${FLTK_LIBRARIES}
+  ${Stage_LIBRARIES}  -ldl)
+  
 if(catkin_EXPORTED_TARGETS)
   add_dependencies(artstage ${catkin_EXPORTED_TARGETS})
 endif()

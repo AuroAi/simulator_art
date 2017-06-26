@@ -21,19 +21,24 @@
 #include <art/steering.h>
 #include "vehicle_model.h"
 
+void ArtVehicleModel::setup(std::string ns_prefix)
+{
+	this->ns_prefix_=ns_prefix;
+	setup();
+}
 void ArtVehicleModel::setup(void)
 {
   int qDepth = 1;
   ros::TransportHints noDelay = ros::TransportHints().tcpNoDelay(true);
 
-  odom_pub_ = node_.advertise<nav_msgs::Odometry>(ns_prefix_ + "odom", qDepth);
-  ground_truth_pub_ = node_.advertise<nav_msgs::Odometry>(ns_prefix_ + "ground_truth", qDepth);
-  imu_pub_ = node_.advertise<sensor_msgs::Imu>(ns_prefix_ + "imu", qDepth);
-  gps_pub_ = node_.advertise<sensor_msgs::NavSatFix>(ns_prefix_ + "gps", qDepth);
-  utm_pub_ = node_.advertise<nav_msgs::Odometry>(ns_prefix_ + "utm", qDepth);
-  steer_angle_pub_ = node_.advertise<std_msgs::Float32>(ns_prefix_ + "steer_angle", 1);
-  steer_vel_pub_ = node_.advertise<std_msgs::Float32>(ns_prefix_ + "steer_vel", 1);
-  veh_info_pub_ = node_.advertise<auro_vehicle_msgs::VehicleInfo>(ns_prefix_ + "vehicle_info", 1);
+  odom_pub_ = node_.advertise<nav_msgs::Odometry>(ns_prefix_ + "/odom", qDepth);
+  ground_truth_pub_ = node_.advertise<nav_msgs::Odometry>(ns_prefix_ + "/ground_truth", qDepth);
+  imu_pub_ = node_.advertise<sensor_msgs::Imu>(ns_prefix_ + "/imu", qDepth);
+  gps_pub_ = node_.advertise<sensor_msgs::NavSatFix>(ns_prefix_ + "/gps", qDepth);
+  utm_pub_ = node_.advertise<nav_msgs::Odometry>(ns_prefix_ + "/utm", qDepth);
+  steer_angle_pub_ = node_.advertise<std_msgs::Float32>(ns_prefix_ + "/steer_angle", 1);
+  steer_vel_pub_ = node_.advertise<std_msgs::Float32>(ns_prefix_ + "/steer_vel", 1);
+  veh_info_pub_ = node_.advertise<auro_vehicle_msgs::VehicleInfo>(ns_prefix_ + "/vehicle_info", 1);
 
   ros::NodeHandle private_nh("~");
   private_nh.param("cmd_mode_ackermann", cmd_mode_ackermann, false);
@@ -66,18 +71,18 @@ void ArtVehicleModel::setup(void)
   if (cmd_mode_ackermann == false)
   {
     // servo state topics
-    brake_sub_ = node_.subscribe(ns_prefix_ + "brake/state", qDepth, &ArtVehicleModel::brakeReceived, this, noDelay);
-    shifter_sub_ = node_.subscribe(ns_prefix_ + "shifter/state", qDepth, &ArtVehicleModel::shifterReceived, this,
+    brake_sub_ = node_.subscribe(ns_prefix_ + "/brake/state", qDepth, &ArtVehicleModel::brakeReceived, this, noDelay);
+    shifter_sub_ = node_.subscribe(ns_prefix_ + "/shifter/state", qDepth, &ArtVehicleModel::shifterReceived, this,
                                    noDelay);
-    steering_sub_ = node_.subscribe(ns_prefix_ + "steering/state", qDepth, &ArtVehicleModel::steeringReceived, this,
+    steering_sub_ = node_.subscribe(ns_prefix_ + "/steering/state", qDepth, &ArtVehicleModel::steeringReceived, this,
                                     noDelay);
-    throttle_sub_ = node_.subscribe(ns_prefix_ + "throttle/state", qDepth, &ArtVehicleModel::throttleReceived, this,
+    throttle_sub_ = node_.subscribe(ns_prefix_ + "/throttle/state", qDepth, &ArtVehicleModel::throttleReceived, this,
                                     noDelay);
   }
   else
   {
     ROS_INFO("cmd_mode_ackermann mode subscribing to  ackermann_cmd");
-    ackermann_sub_ = node_.subscribe(ns_prefix_ + "ackermann_cmd", qDepth, &ArtVehicleModel::ackermannCmdReceived, this,
+    ackermann_sub_ = node_.subscribe(ns_prefix_ + "/ackermann_cmd", qDepth, &ArtVehicleModel::ackermannCmdReceived, this,
                                      noDelay);
   }
   // set default GPS origin, from SwRI site visit in San Antonio
@@ -98,7 +103,6 @@ void ArtVehicleModel::setup(void)
   map_origin_y_ = origin_northing_ - grid_y;
   ROS_INFO("MapXY origin: (%.f, %.f)", map_origin_x_, map_origin_y_);
 }
-
 // Servo device interfaces.
 //
 // IMPORTANT: These callbacks run in a separate thread, so all class

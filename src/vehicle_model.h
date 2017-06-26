@@ -81,6 +81,7 @@ public:
 
   void update(ros::Time sim_time);  // update vehicle model
   void setup(void);                 // set up ROS topics
+  void setup(std::string ns_prefix);
 
 private:
   void ModelAcceleration(geometry_msgs::Twist *odomVel, sensor_msgs::Imu *imu_msg, ros::Time sim_time);

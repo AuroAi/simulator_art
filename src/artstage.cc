@@ -128,6 +128,9 @@ class StageNode
     const inline char *mapName(const std::string name, size_t robotID)
     {return mapName(name.c_str(), robotID);}
 
+    const char *mapName(const char *name, size_t robotID, Stg::Model* mod) const;
+    //const char *mapName(const char *name, size_t robotID, size_t deviceID, Stg::Model* mod) const;
+
     tf::TransformBroadcaster tf;
 
     // Current simulation time
@@ -169,6 +172,34 @@ StageNode::mapName(const char *name, size_t robotID)
     return name;
 }
 
+// since stageros is single-threaded, this is OK. revisit if that changes!
+const char *
+StageNode::mapName(const char *name, size_t robotID, Stg::Model* mod) const
+{
+    //ROS_INFO("Robot %lu: Device %s", robotID, name);
+    //bool umn = this->use_model_names;
+
+    if ((positionmodels.size() > 1 ) )
+    {
+        static char buf[100];
+        std::size_t found = std::string(((Stg::Ancestor *) mod)->Token()).find(":");
+
+        if ((found==std::string::npos) )
+        {
+            snprintf(buf, sizeof(buf), "/%s/%s", ((Stg::Ancestor *) mod)->Token(), name);
+        }
+        else
+        {
+            snprintf(buf, sizeof(buf), "/robot_%u/%s", (unsigned int)robotID, name);
+        }
+
+        return buf;
+    }
+    else
+        return name;
+}
+
+
 void
 StageNode::ghfunc(Stg::Model* mod, StageNode* node)
 {
@@ -180,9 +211,16 @@ StageNode::ghfunc(Stg::Model* mod, StageNode* node)
     node->positionmodels.push_back(dynamic_cast<Stg::ModelPosition *>(mod));
 #else  // earlier version
   // only use the first position model
-  if (dynamic_cast<Stg::ModelPosition *>(mod)
-      && node->positionmodels.size() == 0)
-    node->positionmodels.push_back(dynamic_cast<Stg::ModelPosition *>(mod));
+ // if (dynamic_cast<Stg::ModelPosition *>(mod)
+   //   && node->positionmodels.size() == 0)
+   // node->positionmodels.push_back(dynamic_cast<Stg::ModelPosition *>(mod));
+
+  if (dynamic_cast<Stg::ModelPosition *>(mod)) {
+     Stg::ModelPosition * p = dynamic_cast<Stg::ModelPosition *>(mod);
+      // remember initial poses
+      node->positionmodels.push_back(p);
+      //node->initial_poses.push_back(p->GetGlobalPose());
+    }
 #endif
 }
 
@@ -250,6 +288,7 @@ StageNode::StageNode(int argc, char** argv, bool gui, const char* fname)
 }
 
 
+
 // Subscribe to models of interest.  Currently, we find and subscribe
 // to the first 'laser' model and the first 'position' model.  Returns
 // 0 on success (both models subscribed), -1 otherwise.
@@ -263,31 +302,41 @@ StageNode::SubscribeModels()
 
   for (size_t r = 0; r < this->positionmodels.size(); r++)
   {
-    if(this->lasermodels[r])
-    {
-      this->lasermodels[r]->Subscribe();
-    }
-    else
-    {
-      ROS_ERROR("no laser");
-      return(-1);
-    }
-    if(this->positionmodels[r])
-    {
-      this->positionmodels[r]->Subscribe();
-    }
-    else
-    {
-      ROS_ERROR("no position");
-      return(-1);
-    }
+	ROS_INFO_STREAM("positionmodel number "<< r<< " Name "<<mapName("additional_text",r,static_cast<Stg::Model*>(this->positionmodels[r])));
+	ROS_INFO( "Subscribed to Stage position model \"%s\"", this->positionmodels[r]->Token() );
 
-    // subscribe to ROS topics
-    laser_pubs_.push_back(n_.advertise<sensor_msgs::LaserScan>
-                          (mapName(FRONT_LASER,r), 10));
 
-    // set up vehicle model ROS topics
-    vehicleModels_[r]->setup();
+		if(this->lasermodels[r])
+		{
+		  this->lasermodels[r]->Subscribe();
+		}
+		else
+		{
+		  ROS_ERROR("no laser");
+		  return(-1);
+		}
+		if(this->positionmodels[r])
+		{
+		  this->positionmodels[r]->Subscribe();
+		}
+		else
+		{
+		  ROS_ERROR("no position");
+		  return(-1);
+		}
+
+		// subscribe to ROS topics
+		laser_pubs_.push_back(n_.advertise<sensor_msgs::LaserScan>
+							  (mapName(FRONT_LASER,r), 10));
+
+		// set up vehicle model ROS topics
+
+		vehicleModels_[r]->setup(std::string(this->positionmodels[r]->Token()));
+		
+
+		//this->cmdvel_sub = n_.subscribe<geometry_msgs::Twist>(mapName(CMD_VEL, r, static_cast<Stg::Model*>(this->positionmodel)), 10, boost::bind(&StageNode::cmdvelReceived, this, r, _1));
+		//vehicleModels_[r]->setup();
+
   }
   clock_pub_ = n_.advertise<Clock>("/clock",10);
   return(0);
