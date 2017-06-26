@@ -23,7 +23,7 @@
 
 void ArtVehicleModel::setup(std::string ns_prefix)
 {
-	this->ns_prefix_=ns_prefix;
+	this->ns_prefix_= ns_prefix;
 	setup();
 }
 void ArtVehicleModel::setup(void)

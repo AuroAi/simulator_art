@@ -1,0 +1,79 @@
+
+# defines car-like robots
+include "includes/car.inc"
+
+# defines dynamic obstcle robots
+include "includes/erratic.inc"
+
+
+# defines 'map' object used for floorplans
+include "includes/map.inc"
+
+# defines sick laser
+include "includes/sick.inc"
+
+
+# set the resolution of the underlying raytrace model in meters
+#resolution 0.02
+resolution 0.01
+
+# run simulation and screen updates every 50ms
+#interval_sim 50
+# BUG workaround for stage: only update every 100ms
+interval_sim 25
+
+# configure the GUI window
+window
+(
+  scale 2.853
+  center [5.423 97.895]
+
+
+  # initial GUI options
+  show_data 1
+  show_flags 1
+  show_blocks 1
+  show_clock 0
+  show_footprints 0
+  show_grid 1
+  show_trailarrows 0
+  show_trailrise 0
+  show_trailfast 0
+  show_occupancy 0
+)
+
+map
+(
+  gui_grid 0
+  bitmap "scu.png"
+  size [ 552.000 419.000 0.500 ]
+  name "scu2"
+  obstacle_return 0
+  laser_return 0
+)
+
+
+car
+(
+  name "auro"
+  color "purple"
+  pose [  -12.384 115.578 0.000 -159.947]
+  localization_origin [0.0 0.0 0.0 0.0 0.0 0.0]
+  localization "gps"
+  sick_laser( samples 181 origin [3.178 0.000 -0.940 0.000] )
+  laser_return 1          # visible to lasers
+)
+
+# create another robot as an obstacle (optionally generated)
+car
+(
+  name "obstacle_car"
+  color "blue"
+  size [4.800 2.120 3.000]     # make tall enough for lasers to see
+  pose [-121.208 66.776 0.000 27.202 ]
+  localization_origin [0.0 0.0 0.0 0.0 0.0 0.0]
+  localization "gps"
+  laser_return 1          # visible to lasers
+)
+
+erratic( pose [ -13.277 22.266 0 180.000 ] name "erratic1" color "blue")

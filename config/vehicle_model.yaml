@@ -1,0 +1,12 @@
+height: 1.778
+length: 3.25
+max_accel: 1.2
+max_decl: 3.2
+max_speed: 5.0
+max_steer_degrees: 25.78
+max_steer_radians: 0.45
+max_steering_vel: 1.8
+turning_radius: 4.6
+weight: 700.0
+wheel_base: 2.59
+width: 1.397

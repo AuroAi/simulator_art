@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<launch>
+  <param name="use_sim_time" value="true"/>
+  <arg name="cmd_mode_ackermann" default="true" />
+  <arg name="config_file" default="$(find simulator_art)/config/vehicle_model.yaml"/>
+
+  <rosparam command="load" file="$(arg config_file)" ns="artstage"/>
+
+  <!-- stage simulator for vehicle -->
+  <!-- launch-prefix="xterm -e gdb - -args" -->
+  <node pkg="simulator_art" type="artstage" name="artstage" args="$(find simulator_art)/stage_worlds/$(optenv WORLD scu).world" output="screen" >
+    <rosparam file="$(find scu_data)/stage_worlds/$(optenv WORLD scu).yaml"/>
+    <param name="cmd_mode_ackermann" value="$(arg cmd_mode_ackermann)"/>
+    <param name="broadcast_utm_odom" value="true"/>
+    <param name="delay_location_steps" value="16"/>
+  </node>
+
+  <!--<node pkg="simulator_art" type="obstacles" name="art_simulated_obstacles" />-->
+
+  <node pkg="tf2_ros" type="static_transform_publisher" name="front_sick" args="3.1779999733 0.0 0.699999988079 0.0 0.0 0.0134995902914 0.999908876379 base_link front_sick"/>
+
+  <!-- teleop keyboard-->
+  <include file="$(find ackermann_drive_teleop)/launch/ackermann_drive_keyop.launch"  >
+    <arg name="command_topic" value="auro/ackermann_cmd"/>
+    <arg name="max_speed" value="4.5"/>
+    <arg name="max_angle" value="0.7"/>
+    <arg name="xterm" value="true"/>
+  </include>
+
+</launch>
+
