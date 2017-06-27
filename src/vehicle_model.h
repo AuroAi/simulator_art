@@ -56,7 +56,6 @@ struct state_info
   nav_msgs::Odometry groundTruth;
   sensor_msgs::Imu imu;
 };
-
 class ArtVehicleModel
 {
 public:

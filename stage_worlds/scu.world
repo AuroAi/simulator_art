@@ -55,7 +55,7 @@ map
 
 car
 (
-  name "auro"
+  name "veh_auro"
   color "purple"
   pose [  -12.384 115.578 0.000 -159.947]
   localization_origin [0.0 0.0 0.0 0.0 0.0 0.0]
@@ -67,7 +67,7 @@ car
 # create another robot as an obstacle (optionally generated)
 car
 (
-  name "obstacle_car"
+  name "obs_car"
   color "blue"
   size [4.800 2.120 3.000]     # make tall enough for lasers to see
   pose [-121.208 66.776 0.000 27.202 ]
@@ -76,4 +76,4 @@ car
   laser_return 1          # visible to lasers
 )
 
-erratic( pose [ -13.277 22.266 0 180.000 ] name "erratic1" color "blue")
+erratic( pose [ -13.277 22.266 0 180.000 ] name "ped_one" color "blue")

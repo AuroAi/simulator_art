@@ -205,7 +205,7 @@ void StageNode::ghfunc(Stg::Model* mod, StageNode* node) {
 	// node->positionmodels.push_back(dynamic_cast<Stg::ModelPosition *>(mod));
 
 	if (dynamic_cast<Stg::ModelPosition *>(mod)
-			&& node->positionmodels.size() == 0) //TODO:remove && node->positionmodels.size() == 0
+			) //TODO:remove && node->positionmodels.size() == 0
 	{
 		Stg::ModelPosition * p = dynamic_cast<Stg::ModelPosition *>(mod);
 		// remember initial poses
@@ -284,8 +284,9 @@ int StageNode::SubscribeModels() {
 	n_.setParam("/use_sim_time", true);
 
 	for (size_t r = 0; r < this->positionmodels.size(); r++) {
-		ROS_INFO_STREAM(
-				"positionmodel number "<< r<< " Name "<<mapName("additional_text",r,static_cast<Stg::Model*>(this->positionmodels[r])));
+		ROS_INFO_STREAM("positionmodel number "<< r<< " Name "<<mapName("additional_text",r,static_cast<Stg::Model*>(this->positionmodels[r])));
+		std::string property = "gui_nose";
+		ROS_INFO_STREAM("gui_nose "<< this->positionmodels[r]->GetProperty(property));
 		ROS_INFO("Subscribed to Stage position model \"%s\"",
 				this->positionmodels[r]->Token());
 

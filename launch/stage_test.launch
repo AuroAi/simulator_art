@@ -8,7 +8,7 @@
 
   <!-- stage simulator for vehicle -->
   <!-- launch-prefix="xterm -e gdb - -args" -->
-  <node pkg="simulator_art" type="artstage" name="artstage" args="$(find simulator_art)/stage_worlds/$(optenv WORLD scu).world" output="screen" >
+  <node pkg="simulator_art" type="stageros" name="stageros" args="-u $(find simulator_art)/stage_worlds/$(optenv WORLD scu).world" output="screen"  >
     <rosparam file="$(find scu_data)/stage_worlds/$(optenv WORLD scu).yaml"/>
     <param name="cmd_mode_ackermann" value="$(arg cmd_mode_ackermann)"/>
     <param name="broadcast_utm_odom" value="true"/>
@@ -21,11 +21,19 @@
 
   <!-- teleop keyboard-->
   <include file="$(find ackermann_drive_teleop)/launch/ackermann_drive_keyop.launch"  >
-    <arg name="command_topic" value="auro/ackermann_cmd"/>
+    <arg name="command_topic" value="/veh_auro/ackermann_cmd"/>
     <arg name="max_speed" value="4.5"/>
     <arg name="max_angle" value="0.7"/>
     <arg name="xterm" value="true"/>
   </include>
-
+  
+  <!-- 
+  <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop_twist_keyboard1" launch-prefix="xterm" >
+	  <remap from="cmd_vel" to="obs_car1/cmd_vel" />
+  </node>
+    <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop_twist_keyboard2" launch-prefix="xterm" >
+	  <remap from="cmd_vel" to="obs_car2/cmd_vel" />
+  </node>
+-->
 </launch>
 
