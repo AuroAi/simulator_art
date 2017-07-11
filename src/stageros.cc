@@ -203,10 +203,10 @@ StageNode::mapName(const char *name, size_t robotID, Stg::Model* mod,bool veh) c
     static char buf[100];
     std::size_t found = std::string(((Stg::Ancestor *) mod)->Token()).find(":");
 
-    /*if(veh==true)
+    if(veh==true)
     {
       snprintf(buf, sizeof(buf), "/%s", name);
-    }else */if ((found==std::string::npos) && umn)
+    }else if ((found==std::string::npos) && umn)
     {
       snprintf(buf, sizeof(buf), "/%s/%s", ((Stg::Ancestor *) mod)->Token(), name);
     }
@@ -232,10 +232,10 @@ StageNode::mapName(const char *name, size_t robotID, size_t deviceID, Stg::Model
     static char buf[100];
     std::size_t found = std::string(((Stg::Ancestor *) mod)->Token()).find(":");
 
-   /* if(veh==true)
+    if(veh==true)
     {
       snprintf(buf, sizeof(buf), "/%s_%u", name, (unsigned int)deviceID);
-    }else*/ if ((found==std::string::npos) && umn)
+    }else if ((found==std::string::npos) && umn)
     {
       snprintf(buf, sizeof(buf), "/%s/%s_%u", ((Stg::Ancestor *) mod)->Token(), name, (unsigned int)deviceID);
     }
@@ -386,10 +386,15 @@ StageNode::SubscribeModels()
       //set vehicle model
       ROS_INFO( "set vehicle model" );
       vehicle_model_set = true;
-      vehicleModel = new ArtVehicleModel(positionmodels[r], &tf, std::string(this->positionmodels[r]->Token()));
-      //vehicleModel = new ArtVehicleModel(positionmodels[r], &tf,"");
+      //vehicleModel = new ArtVehicleModel(positionmodels[r], &tf, std::string(this->positionmodels[r]->Token()));
+      vehicleModel = new ArtVehicleModel(positionmodels[r], &tf,"");
       vehicleModel->setup();
       new_robot->type_veh = true;
+
+		//For testing if odom here is same as in vehicle model
+  	  new_robot->odom_pub = n_.advertise<nav_msgs::Odometry>("stage_odom", 10);
+      new_robot->ground_truth_pub = n_.advertise<nav_msgs::Odometry>("stage_odom_ground_truth", 10);
+
 
     }
     else
@@ -398,6 +403,9 @@ StageNode::SubscribeModels()
       ROS_INFO( "set normal robot model" );
       new_robot->type_veh = false;
       new_robot->cmdvel_sub = n_.subscribe<geometry_msgs::Twist>(mapName(CMD_VEL, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10, boost::bind(&StageNode::cmdvelReceived, this, r, _1));
+      //TODO: take odom and ground truth out of this condition once it is not published redundantly in vehicle model
+	  new_robot->odom_pub = n_.advertise<nav_msgs::Odometry>(mapName(ODOM, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10);
+      new_robot->ground_truth_pub = n_.advertise<nav_msgs::Odometry>(mapName(BASE_POSE_GROUND_TRUTH, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10);
 
     }
     for (size_t s = 0; s < this->lasermodels.size(); s++)
@@ -421,10 +429,7 @@ StageNode::SubscribeModels()
       }
     }
 
-    //TODO: not setting this->robotmodels_[r]->type_veh in mapName as odom published inside vehicle model also
-    new_robot->odom_pub = n_.advertise<nav_msgs::Odometry>(mapName(ODOM, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10);
-    new_robot->ground_truth_pub = n_.advertise<nav_msgs::Odometry>(mapName(BASE_POSE_GROUND_TRUTH, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10);
-
+   
 
 
     // TODO - print the topic names nicely as well
@@ -437,9 +442,9 @@ StageNode::SubscribeModels()
     for (size_t s = 0;  s < new_robot->lasermodels.size(); ++s)
     {
       if (new_robot->lasermodels.size() == 1)
-        new_robot->laser_pubs.push_back(n_.advertise<sensor_msgs::LaserScan>(mapName(BASE_SCAN, r, static_cast<Stg::Model*>(new_robot->positionmodel),this->robotmodels_[r]->type_veh), 10));
+        new_robot->laser_pubs.push_back(n_.advertise<sensor_msgs::LaserScan>(mapName(BASE_SCAN, r, static_cast<Stg::Model*>(new_robot->positionmodel),new_robot->type_veh), 10));
       else
-        new_robot->laser_pubs.push_back(n_.advertise<sensor_msgs::LaserScan>(mapName(BASE_SCAN, r, s, static_cast<Stg::Model*>(new_robot->positionmodel),this->robotmodels_[r]->type_veh), 10));
+        new_robot->laser_pubs.push_back(n_.advertise<sensor_msgs::LaserScan>(mapName(BASE_SCAN, r, s, static_cast<Stg::Model*>(new_robot->positionmodel),new_robot->type_veh), 10));
 
     }
 
@@ -447,15 +452,15 @@ StageNode::SubscribeModels()
     {
       if (new_robot->cameramodels.size() == 1)
       {
-        new_robot->image_pubs.push_back(n_.advertise<sensor_msgs::Image>(mapName(IMAGE, r, static_cast<Stg::Model*>(new_robot->positionmodel),this->robotmodels_[r]->type_veh), 10));
-        new_robot->depth_pubs.push_back(n_.advertise<sensor_msgs::Image>(mapName(DEPTH, r, static_cast<Stg::Model*>(new_robot->positionmodel),this->robotmodels_[r]->type_veh), 10));
-        new_robot->camera_pubs.push_back(n_.advertise<sensor_msgs::CameraInfo>(mapName(CAMERA_INFO, r, static_cast<Stg::Model*>(new_robot->positionmodel),this->robotmodels_[r]->type_veh), 10));
+        new_robot->image_pubs.push_back(n_.advertise<sensor_msgs::Image>(mapName(IMAGE, r, static_cast<Stg::Model*>(new_robot->positionmodel),new_robot->type_veh), 10));
+        new_robot->depth_pubs.push_back(n_.advertise<sensor_msgs::Image>(mapName(DEPTH, r, static_cast<Stg::Model*>(new_robot->positionmodel),new_robot->type_veh), 10));
+        new_robot->camera_pubs.push_back(n_.advertise<sensor_msgs::CameraInfo>(mapName(CAMERA_INFO, r, static_cast<Stg::Model*>(new_robot->positionmodel),new_robot->type_veh), 10));
       }
       else
       {
-        new_robot->image_pubs.push_back(n_.advertise<sensor_msgs::Image>(mapName(IMAGE, r, s, static_cast<Stg::Model*>(new_robot->positionmodel),this->robotmodels_[r]->type_veh), 10));
-        new_robot->depth_pubs.push_back(n_.advertise<sensor_msgs::Image>(mapName(DEPTH, r, s, static_cast<Stg::Model*>(new_robot->positionmodel),this->robotmodels_[r]->type_veh), 10));
-        new_robot->camera_pubs.push_back(n_.advertise<sensor_msgs::CameraInfo>(mapName(CAMERA_INFO, r, s, static_cast<Stg::Model*>(new_robot->positionmodel),this->robotmodels_[r]->type_veh), 10));
+        new_robot->image_pubs.push_back(n_.advertise<sensor_msgs::Image>(mapName(IMAGE, r, s, static_cast<Stg::Model*>(new_robot->positionmodel),new_robot->type_veh), 10));
+        new_robot->depth_pubs.push_back(n_.advertise<sensor_msgs::Image>(mapName(DEPTH, r, s, static_cast<Stg::Model*>(new_robot->positionmodel),new_robot->type_veh), 10));
+        new_robot->camera_pubs.push_back(n_.advertise<sensor_msgs::CameraInfo>(mapName(CAMERA_INFO, r, s, static_cast<Stg::Model*>(new_robot->positionmodel),new_robot->type_veh), 10));
       }
     }
     this->robotmodels_.push_back(new_robot);
@@ -600,7 +605,7 @@ StageNode::WorldCallback()
 
         for(unsigned int i = 0; i < sensor.ranges.size(); i++)
         {
-          msg.ranges[i] = sensor.ranges[i];
+          msg.ranges[i] = sensor.ranges[i]==sensor.range.max?(sensor.range.max-0.01):sensor.ranges[i];
           msg.intensities[i] = sensor.intensities[i];
         }
 
@@ -634,11 +639,13 @@ StageNode::WorldCallback()
     }
 
     //the position of the robot
+if(!this->robotmodels_[r]->type_veh)
+{
     tf.sendTransform(tf::StampedTransform(tf::Transform::getIdentity(),
                                           sim_time,
                                           mapName("base_footprint", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh),
                                           mapName("base_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh)));
-
+}
     // Get latest odometry data
     // Translate into ROS message format and publish
     nav_msgs::Odometry odom_msg;
@@ -653,19 +660,20 @@ StageNode::WorldCallback()
     //@todo Publish stall on a separate topic when one becomes available
     //this->odomMsgs[r].stall = this->positionmodels[r]->Stall();
     //
-    odom_msg.header.frame_id = mapName("odom", r, static_cast<Stg::Model*>(robotmodel->positionmodel));
+    odom_msg.header.frame_id = mapName("odom", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh);
     odom_msg.header.stamp = sim_time;
 
     robotmodel->odom_pub.publish(odom_msg);
-
+if(!this->robotmodels_[r]->type_veh)
+{
     // broadcast odometry transform
     tf::Quaternion odomQ;
     tf::quaternionMsgToTF(odom_msg.pose.pose.orientation, odomQ);
     tf::Transform txOdom(odomQ, tf::Point(odom_msg.pose.pose.position.x, odom_msg.pose.pose.position.y, 0.0));
     tf.sendTransform(tf::StampedTransform(txOdom, sim_time,
-                                          mapName("odom", r, static_cast<Stg::Model*>(robotmodel->positionmodel)),
-                                          mapName("base_footprint", r, static_cast<Stg::Model*>(robotmodel->positionmodel))));
-
+                                          mapName("odom", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh),
+                                          mapName("base_footprint", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh)));
+}
     // Also publish the ground truth pose and velocity
     Stg::Pose gpose = robotmodel->positionmodel->GetGlobalPose();
     tf::Quaternion q_gpose;
@@ -700,7 +708,7 @@ StageNode::WorldCallback()
     ground_truth_msg.twist.twist.linear.z = gvel.z;
     ground_truth_msg.twist.twist.angular.z = gvel.a;
 
-    ground_truth_msg.header.frame_id = mapName("odom", r, static_cast<Stg::Model*>(robotmodel->positionmodel));
+    ground_truth_msg.header.frame_id = mapName("odom", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh);
     ground_truth_msg.header.stamp = sim_time;
 
 
@@ -738,9 +746,9 @@ StageNode::WorldCallback()
         }
 
         if (robotmodel->cameramodels.size() > 1)
-          image_msg.header.frame_id = mapName("camera", r, s, static_cast<Stg::Model*>(robotmodel->positionmodel));
+          image_msg.header.frame_id = mapName("camera", r, s, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh);
         else
-          image_msg.header.frame_id = mapName("camera", r,static_cast<Stg::Model*>(robotmodel->positionmodel));
+          image_msg.header.frame_id = mapName("camera", r,static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh);
         image_msg.header.stamp = sim_time;
 
         robotmodel->image_pubs[s].publish(image_msg);
@@ -795,9 +803,9 @@ StageNode::WorldCallback()
         }
 
         if (robotmodel->cameramodels.size() > 1)
-          depth_msg.header.frame_id = mapName("camera", r, s, static_cast<Stg::Model*>(robotmodel->positionmodel));
+          depth_msg.header.frame_id = mapName("camera", r, s, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh);
         else
-          depth_msg.header.frame_id = mapName("camera", r, static_cast<Stg::Model*>(robotmodel->positionmodel));
+          depth_msg.header.frame_id = mapName("camera", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh);
         depth_msg.header.stamp = sim_time;
         robotmodel->depth_pubs[s].publish(depth_msg);
       }
@@ -818,18 +826,18 @@ StageNode::WorldCallback()
 
         if (robotmodel->cameramodels.size() > 1)
           tf.sendTransform(tf::StampedTransform(tr, sim_time,
-                                                mapName("base_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel)),
-                                                mapName("camera", r, s, static_cast<Stg::Model*>(robotmodel->positionmodel))));
+                                                mapName("base_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh),
+                                                mapName("camera", r, s, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh)));
         else
           tf.sendTransform(tf::StampedTransform(tr, sim_time,
-                                                mapName("base_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel)),
-                                                mapName("camera", r, static_cast<Stg::Model*>(robotmodel->positionmodel))));
+                                                mapName("base_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh),
+                                                mapName("camera", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh)));
 
         sensor_msgs::CameraInfo camera_msg;
         if (robotmodel->cameramodels.size() > 1)
-          camera_msg.header.frame_id = mapName("camera", r, s, static_cast<Stg::Model*>(robotmodel->positionmodel));
+          camera_msg.header.frame_id = mapName("camera", r, s, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh);
         else
-          camera_msg.header.frame_id = mapName("camera", r, static_cast<Stg::Model*>(robotmodel->positionmodel));
+          camera_msg.header.frame_id = mapName("camera", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh);
         camera_msg.header.stamp = sim_time;
         camera_msg.height = cameramodel->getHeight();
         camera_msg.width = cameramodel->getWidth();
