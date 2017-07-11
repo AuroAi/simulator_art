@@ -48,6 +48,11 @@
 #include <sensor_msgs/CameraInfo.h>
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/Twist.h>
+#include <dynamic_obs_msgs/DynamicObstacle.h>
+#include <dynamic_obs_msgs/DynObsTrajectory.h>
+#include <dynamic_obs_msgs/DynamicObstacles.h>
+
+#include <geometry_msgs/PoseStamped.h>
 #include <rosgraph_msgs/Clock.h>
 
 #include <std_srvs/Empty.h>
@@ -65,7 +70,10 @@
 #define BASE_SCAN "base_scan"
 #define BASE_POSE_GROUND_TRUTH "base_pose_ground_truth"
 #define CMD_VEL "cmd_vel"
+#define DYNAMIC_OBSTACLES "dynamic_obstacles"
 
+geometry_msgs::PoseStamped points[200]; //global variable to keep track of time parametrized points, just for simulation purposes TODO: Correct later
+int point_counter = 0; //to keep track of first empty index in array points[]
 // Our node
 class StageNode
 {
@@ -83,6 +91,7 @@ private:
   std::vector<Stg::ModelPosition *> positionmodels;
 
   bool vehicle_model_set;
+  ros::Publisher tracker_pub; //for dynamic obstacle tracking
 
   //a structure representing a robot inthe simulator
   struct StageRobot
@@ -95,6 +104,7 @@ private:
     //ros publishers
     ros::Publisher odom_pub; //one odom
     ros::Publisher ground_truth_pub; //one ground truth
+
 
     std::vector<ros::Publisher> image_pubs; //multiple images
     std::vector<ros::Publisher> depth_pubs; //multiple depths
@@ -117,6 +127,8 @@ private:
   bool isDepthCanonical;
   bool use_model_names;
 
+  dynamic_obs_msgs::DynamicObstacles dynamic_obstacle_list;
+
   // A helper function that is executed for each stage model.  We use it
   // to search for models of interest.
   static void ghfunc(Stg::Model* mod, StageNode* node);
@@ -131,8 +143,8 @@ private:
 
   // Appends the given robot ID to the given message name.  If omitRobotID
   // is true, an unaltered copy of the name is returned.
-  const char *mapName(const char *name, size_t robotID, Stg::Model* mod) const;
-  const char *mapName(const char *name, size_t robotID, size_t deviceID, Stg::Model* mod) const;
+  const char *mapName(const char *name, size_t robotID, Stg::Model* mod, bool veh=false) const;
+  const char *mapName(const char *name, size_t robotID, size_t deviceID, Stg::Model* mod, bool veh=false) const;
 
   tf::TransformBroadcaster tf;
 
@@ -159,6 +171,9 @@ public:
   // 0 on success (both models subscribed), -1 otherwise.
   int SubscribeModels();
 
+  //update information about dynamic obstacles
+  void updateDynamicObstacles(dynamic_obs_msgs::DynamicObstacles* obstacle_list, ros::Time sim_time);
+
   // Our callback
   void WorldCallback();
 
@@ -178,7 +193,7 @@ public:
 
 // since stageros is single-threaded, this is OK. revisit if that changes!
 const char *
-StageNode::mapName(const char *name, size_t robotID, Stg::Model* mod) const
+StageNode::mapName(const char *name, size_t robotID, Stg::Model* mod,bool veh) const
 {
   //ROS_INFO("Robot %lu: Device %s", robotID, name);
   bool umn = this->use_model_names;
@@ -188,7 +203,10 @@ StageNode::mapName(const char *name, size_t robotID, Stg::Model* mod) const
     static char buf[100];
     std::size_t found = std::string(((Stg::Ancestor *) mod)->Token()).find(":");
 
-    if ((found==std::string::npos) && umn)
+    /*if(veh==true)
+    {
+      snprintf(buf, sizeof(buf), "/%s", name);
+    }else */if ((found==std::string::npos) && umn)
     {
       snprintf(buf, sizeof(buf), "/%s/%s", ((Stg::Ancestor *) mod)->Token(), name);
     }
@@ -204,7 +222,7 @@ StageNode::mapName(const char *name, size_t robotID, Stg::Model* mod) const
 }
 
 const char *
-StageNode::mapName(const char *name, size_t robotID, size_t deviceID, Stg::Model* mod) const
+StageNode::mapName(const char *name, size_t robotID, size_t deviceID, Stg::Model* mod, bool veh) const
 {
   //ROS_INFO("Robot %lu: Device %s:%lu", robotID, name, deviceID);
   bool umn = this->use_model_names;
@@ -214,7 +232,10 @@ StageNode::mapName(const char *name, size_t robotID, size_t deviceID, Stg::Model
     static char buf[100];
     std::size_t found = std::string(((Stg::Ancestor *) mod)->Token()).find(":");
 
-    if ((found==std::string::npos) && umn)
+   /* if(veh==true)
+    {
+      snprintf(buf, sizeof(buf), "/%s_%u", name, (unsigned int)deviceID);
+    }else*/ if ((found==std::string::npos) && umn)
     {
       snprintf(buf, sizeof(buf), "/%s/%s_%u", ((Stg::Ancestor *) mod)->Token(), name, (unsigned int)deviceID);
     }
@@ -335,6 +356,7 @@ int
 StageNode::SubscribeModels()
 {
   n_.setParam("/use_sim_time", true);
+  tracker_pub = n_.advertise<dynamic_obs_msgs::DynamicObstacles>(DYNAMIC_OBSTACLES, 10);
 
   for (size_t r = 0; r < this->positionmodels.size(); r++)
   {
@@ -361,17 +383,18 @@ StageNode::SubscribeModels()
 
     if(!strcmp(prefix,"veh") && !vehicle_model_set)
     {
-      //set vehicel model
-      ROS_INFO( "set vehicel model" );
+      //set vehicle model
+      ROS_INFO( "set vehicle model" );
       vehicle_model_set = true;
       vehicleModel = new ArtVehicleModel(positionmodels[r], &tf, std::string(this->positionmodels[r]->Token()));
+      //vehicleModel = new ArtVehicleModel(positionmodels[r], &tf,"");
       vehicleModel->setup();
       new_robot->type_veh = true;
 
     }
     else
     {
-      //normal robot
+      //dynamic obstacle/robot
       ROS_INFO( "set normal robot model" );
       new_robot->type_veh = false;
       new_robot->cmdvel_sub = n_.subscribe<geometry_msgs::Twist>(mapName(CMD_VEL, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10, boost::bind(&StageNode::cmdvelReceived, this, r, _1));
@@ -398,8 +421,10 @@ StageNode::SubscribeModels()
       }
     }
 
+    //TODO: not setting this->robotmodels_[r]->type_veh in mapName as odom published inside vehicle model also
     new_robot->odom_pub = n_.advertise<nav_msgs::Odometry>(mapName(ODOM, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10);
     new_robot->ground_truth_pub = n_.advertise<nav_msgs::Odometry>(mapName(BASE_POSE_GROUND_TRUTH, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10);
+
 
 
     // TODO - print the topic names nicely as well
@@ -412,9 +437,9 @@ StageNode::SubscribeModels()
     for (size_t s = 0;  s < new_robot->lasermodels.size(); ++s)
     {
       if (new_robot->lasermodels.size() == 1)
-        new_robot->laser_pubs.push_back(n_.advertise<sensor_msgs::LaserScan>(mapName(BASE_SCAN, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10));
+        new_robot->laser_pubs.push_back(n_.advertise<sensor_msgs::LaserScan>(mapName(BASE_SCAN, r, static_cast<Stg::Model*>(new_robot->positionmodel),this->robotmodels_[r]->type_veh), 10));
       else
-        new_robot->laser_pubs.push_back(n_.advertise<sensor_msgs::LaserScan>(mapName(BASE_SCAN, r, s, static_cast<Stg::Model*>(new_robot->positionmodel)), 10));
+        new_robot->laser_pubs.push_back(n_.advertise<sensor_msgs::LaserScan>(mapName(BASE_SCAN, r, s, static_cast<Stg::Model*>(new_robot->positionmodel),this->robotmodels_[r]->type_veh), 10));
 
     }
 
@@ -422,38 +447,17 @@ StageNode::SubscribeModels()
     {
       if (new_robot->cameramodels.size() == 1)
       {
-        new_robot->image_pubs.push_back(n_.advertise<sensor_msgs::Image>(mapName(IMAGE, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10));
-        new_robot->depth_pubs.push_back(n_.advertise<sensor_msgs::Image>(mapName(DEPTH, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10));
-        new_robot->camera_pubs.push_back(n_.advertise<sensor_msgs::CameraInfo>(mapName(CAMERA_INFO, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10));
+        new_robot->image_pubs.push_back(n_.advertise<sensor_msgs::Image>(mapName(IMAGE, r, static_cast<Stg::Model*>(new_robot->positionmodel),this->robotmodels_[r]->type_veh), 10));
+        new_robot->depth_pubs.push_back(n_.advertise<sensor_msgs::Image>(mapName(DEPTH, r, static_cast<Stg::Model*>(new_robot->positionmodel),this->robotmodels_[r]->type_veh), 10));
+        new_robot->camera_pubs.push_back(n_.advertise<sensor_msgs::CameraInfo>(mapName(CAMERA_INFO, r, static_cast<Stg::Model*>(new_robot->positionmodel),this->robotmodels_[r]->type_veh), 10));
       }
       else
       {
-        new_robot->image_pubs.push_back(n_.advertise<sensor_msgs::Image>(mapName(IMAGE, r, s, static_cast<Stg::Model*>(new_robot->positionmodel)), 10));
-        new_robot->depth_pubs.push_back(n_.advertise<sensor_msgs::Image>(mapName(DEPTH, r, s, static_cast<Stg::Model*>(new_robot->positionmodel)), 10));
-        new_robot->camera_pubs.push_back(n_.advertise<sensor_msgs::CameraInfo>(mapName(CAMERA_INFO, r, s, static_cast<Stg::Model*>(new_robot->positionmodel)), 10));
+        new_robot->image_pubs.push_back(n_.advertise<sensor_msgs::Image>(mapName(IMAGE, r, s, static_cast<Stg::Model*>(new_robot->positionmodel),this->robotmodels_[r]->type_veh), 10));
+        new_robot->depth_pubs.push_back(n_.advertise<sensor_msgs::Image>(mapName(DEPTH, r, s, static_cast<Stg::Model*>(new_robot->positionmodel),this->robotmodels_[r]->type_veh), 10));
+        new_robot->camera_pubs.push_back(n_.advertise<sensor_msgs::CameraInfo>(mapName(CAMERA_INFO, r, s, static_cast<Stg::Model*>(new_robot->positionmodel),this->robotmodels_[r]->type_veh), 10));
       }
     }
-
-
-    /*
-		typedef enum { SHUTTLE, PEDESTRIAN, DEFAULT } ModelTypes;
-		if(this->positionmodels[r]->type == 'SHUTTLE')
-		{
-		  ShuttleModel* model = new ShuttleModel;
-		}
-		else if(this->positionmodels[r]->type == 'PEDESTRIAN')
-		{
-		  PedModel* model = new PedModel;
-		}
-		else
-		{
-		  new_robot->odom_pub = n_.advertise<nav_msgs::Odometry>(mapName(ODOM, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10);
-		  new_robot->ground_truth_pub = n_.advertise<nav_msgs::Odometry>(mapName(BASE_POSE_GROUND_TRUTH, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10);
-		  new_robot->cmdvel_sub = n_.subscribe<geometry_msgs::Twist>(mapName(CMD_VEL, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10, boost::bind(&StageNode::cmdvelReceived, this, r, _1));
-
-		}*/
-
-
     this->robotmodels_.push_back(new_robot);
   }
 
@@ -483,6 +487,49 @@ StageNode::UpdateWorld()
 {
   return this->world->UpdateAll();
 }
+void
+StageNode::updateDynamicObstacles(dynamic_obs_msgs::DynamicObstacles* obstacle_list, ros::Time sim_time)
+{
+  obstacle_list->header.frame_id = "map";
+  obstacle_list->header.stamp = sim_time;
+  obstacle_list->dyn_obs.resize(robotmodels_.size()); //resize to total number of obstacles
+
+  for(size_t r =0; r < this->robotmodels_.size(); ++r)
+  {
+
+    //set necessary paramters for dynamic obstacle at index i in obstacle_list->dyn_obs
+    obstacle_list->dyn_obs.at(r).volume.x = 4.8;
+    obstacle_list->dyn_obs.at(r).volume.y = 2.12;
+    obstacle_list->dyn_obs.at(r).volume.z = 3.00;
+    obstacle_list->dyn_obs.at(r).nbpoints = 20; //arbritary number for simulation purpsoses
+    obstacle_list->dyn_obs.at(r).id = r;
+    obstacle_list->dyn_obs.at(r).status = dynamic_obs_msgs::DynamicObstacle::STATUS_ALIVE;
+
+    if(obstacle_list->dyn_obs.at(r).trajectories.size() == 0){
+      obstacle_list->dyn_obs.at(r).trajectories.resize(1); //for simplification purposes, each dynamic obstacle will only have 1 trajectory associated with it
+    }
+    obstacle_list->dyn_obs.at(r).trajectories.at(0).probability = 1; //only 1 trajectory, so probability must be 1
+    obstacle_list->dyn_obs.at(r).trajectories.at(0).exists_after = false; //does not become a static obstacle after obstacle completes its path
+
+    geometry_msgs::PoseStamped temp_pose;
+    StageRobot const * robotmodel = this->robotmodels_[r];
+    Stg::Pose gpose = robotmodel->positionmodel->GetGlobalPose();
+    tf::Quaternion q_gpose;
+    q_gpose.setRPY(0.0, 0.0, gpose.a);
+    tf::Transform gt(q_gpose, tf::Point(gpose.x, gpose.y, 0.0));
+    temp_pose.pose.position.x = gt.getOrigin().x();
+    temp_pose.pose.position.y = gt.getOrigin().y();
+    temp_pose.pose.position.z = gt.getOrigin().z();
+    temp_pose.pose.orientation.x = gt.getRotation().x();
+    temp_pose.pose.orientation.y = gt.getRotation().y();
+    temp_pose.pose.orientation.z = gt.getRotation().z();
+    temp_pose.pose.orientation.w = gt.getRotation().w();
+    temp_pose.header.frame_id = obstacle_list->header.frame_id;
+    temp_pose.header.stamp = sim_time;
+    obstacle_list->dyn_obs.at(r).trajectories.at(0).points.push_back(temp_pose); //add point to time-paramterized path
+
+  }
+}
 
 void
 StageNode::WorldCallback()
@@ -509,8 +556,13 @@ StageNode::WorldCallback()
       ((this->sim_time - this->base_last_cmd) >= this->base_watchdog_timeout))
   {
     for (size_t r = 0; r < this->positionmodels.size(); r++)
-      this->positionmodels[r]->SetSpeed(0.0, 0.0, 0.0);
+      if(!this->robotmodels_[r]->type_veh)
+        this->positionmodels[r]->SetSpeed(0.0, 0.0, 0.0);
   }
+
+
+
+
 
   //loop on the robot models
   for (size_t r = 0; r < this->robotmodels_.size(); ++r)
@@ -552,10 +604,10 @@ StageNode::WorldCallback()
           msg.intensities[i] = sensor.intensities[i];
         }
 
-        if (robotmodel->lasermodels.size() > 1)
-          msg.header.frame_id = mapName("base_laser_link", r, s, static_cast<Stg::Model*>(robotmodel->positionmodel));
-        else
-          msg.header.frame_id = mapName("base_laser_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel));
+          if (robotmodel->lasermodels.size() > 1)
+            msg.header.frame_id = mapName("base_laser_link", r, s, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh);
+          else
+            msg.header.frame_id = mapName("base_laser_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh);
 
         msg.header.stamp = sim_time;
         robotmodel->laser_pubs[s].publish(msg);
@@ -568,21 +620,24 @@ StageNode::WorldCallback()
       laserQ.setRPY(0.0, 0.0, lp.a);
       tf::Transform txLaser =  tf::Transform(laserQ, tf::Point(lp.x, lp.y, robotmodel->positionmodel->GetGeom().size.z + lp.z));
 
+
+
       if (robotmodel->lasermodels.size() > 1)
         tf.sendTransform(tf::StampedTransform(txLaser, sim_time,
-                                              mapName("base_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel)),
-                                              mapName("base_laser_link", r, s, static_cast<Stg::Model*>(robotmodel->positionmodel))));
+                                              mapName("base_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh),
+                                              mapName("base_laser_link", r, s, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh)));
       else
         tf.sendTransform(tf::StampedTransform(txLaser, sim_time,
-                                              mapName("base_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel)),
-                                              mapName("base_laser_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel))));
+                                              mapName("base_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh),
+                                              mapName("base_laser_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh)));
+
     }
 
     //the position of the robot
     tf.sendTransform(tf::StampedTransform(tf::Transform::getIdentity(),
                                           sim_time,
-                                          mapName("base_footprint", r, static_cast<Stg::Model*>(robotmodel->positionmodel)),
-                                          mapName("base_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel))));
+                                          mapName("base_footprint", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh),
+                                          mapName("base_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh)));
 
     // Get latest odometry data
     // Translate into ROS message format and publish
@@ -647,6 +702,7 @@ StageNode::WorldCallback()
 
     ground_truth_msg.header.frame_id = mapName("odom", r, static_cast<Stg::Model*>(robotmodel->positionmodel));
     ground_truth_msg.header.stamp = sim_time;
+
 
     robotmodel->ground_truth_pub.publish(ground_truth_msg);
 
@@ -726,7 +782,6 @@ StageNode::WorldCallback()
             ((uint16_t*)&(depth_msg.data[0]))[i] = (uint16_t) ((v<=nearClip || v>=farClip) ? 0 : v );
           }
         }
-
         //invert the opengl weirdness
         int height = depth_msg.height - 1;
         int linewidth = depth_msg.width*sz;
@@ -816,6 +871,9 @@ StageNode::WorldCallback()
 
     }
   }
+
+  StageNode::updateDynamicObstacles(&dynamic_obstacle_list, sim_time);
+  tracker_pub.publish(dynamic_obstacle_list); //publish to dynamic_obstacle_tracking package
 
   this->base_last_globalpos_time = this->sim_time;
   rosgraph_msgs::Clock clock_msg;

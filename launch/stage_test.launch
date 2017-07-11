@@ -5,7 +5,7 @@
   <arg name="config_file" default="$(find simulator_art)/config/vehicle_model.yaml"/>
 
   <rosparam command="load" file="$(arg config_file)" ns="artstage"/>
-
+	
   <!-- stage simulator for vehicle -->
   <!-- launch-prefix="xterm -e gdb - -args" -->
   <node pkg="simulator_art" type="stageros" name="stageros" args="-u $(find simulator_art)/stage_worlds/$(optenv WORLD scu).world" output="screen"  >
@@ -26,11 +26,36 @@
     <arg name="max_angle" value="0.7"/>
     <arg name="xterm" value="true"/>
   </include>
-  
-  <!-- 
-  <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop_twist_keyboard1" launch-prefix="xterm" >
-	  <remap from="cmd_vel" to="obs_car1/cmd_vel" />
+   <!--
+   <node pkg ="obstacle_controller" type="back_and_forth_obstacle.py" name="backforth_ped_one">
+	   <remap from="/cmd_vel" to="/ped_one/cmd_vel" />
   </node>
+  -->
+  <node pkg ="obstacle_controller" type="back_and_forth_obstacle.py" name="backforth">
+	  <param name="vel_topic_path" type="str" value="/obs_car/cmd_vel"/>
+	  <param name="speed" type="double" value="10"/>
+	  <param name="distance" type="int" value="500"/>
+	  <param name="xdir" type="int" value="1"/>
+	  <param name="ydir" type="int" value="1"/>
+  </node>
+  
+  <node pkg ="obstacle_controller" type="back_and_forth_obstacle.py" name="backforth1">
+	  <param name="vel_topic_path" type="str" value="/obs_car1/cmd_vel"/>
+	  <param name="speed" type="double" value="20"/>
+	  <param name="distance" type="int" value="500"/>
+	  <param name="xdir" type="int" value="1"/>
+	  <param name="ydir" type="int" value="1"/>
+  </node>
+  
+   <!-- 
+  <node pkg ="obstacle_controller" type="back_and_forth_obstacle.py" name="backforth1">
+	  <remap from="/cmd_vel" to="/obs_car1/cmd_vel"/>
+  </node>
+
+  <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop_twist_keyboard1"  launch-prefix="xterm -e" >
+	<remap from="/cmd_vel" to="/obs_car/cmd_vel" />
+  </node>
+ 
     <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop_twist_keyboard2" launch-prefix="xterm" >
 	  <remap from="cmd_vel" to="obs_car2/cmd_vel" />
   </node>

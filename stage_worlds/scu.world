@@ -76,4 +76,19 @@ car
   laser_return 1          # visible to lasers
 )
 
-erratic( pose [ -13.277 22.266 0 180.000 ] name "ped_one" color "blue")
+# create another robot as an obstacle (optionally generated)
+car
+(
+  name "obs_car1"
+  color "red"
+  size [4.800 2.120 3.000]     # make tall enough for lasers to see
+  pose [-125.319 70.887 0.000 30.313 ]
+  localization_origin [0.0 0.0 0.0 0.0 0.0 0.0]
+  localization "gps"
+  laser_return 1          # visible to lasers
+)
+
+
+
+
+erratic( pose [ -13.277 22.266 0 180.000 ] name "ped_one" color "blue" size [1.060 1.060 2.500])
