@@ -70,10 +70,10 @@
 #define BASE_SCAN "base_scan"
 #define BASE_POSE_GROUND_TRUTH "base_pose_ground_truth"
 #define CMD_VEL "cmd_vel"
-#define DYNAMIC_OBSTACLES "dynamic_obstacles"
+#define DYNAMIC_OBSTACLES_TOPIC "dynamic_obstacles"
 
 geometry_msgs::PoseStamped points[200]; //global variable to keep track of time parametrized points, just for simulation purposes TODO: Correct later
-int point_counter = 0; //to keep track of first empty index in array points[]
+
 // Our node
 class StageNode
 {
@@ -92,6 +92,8 @@ private:
 
   bool vehicle_model_set;
   ros::Publisher tracker_pub; //for dynamic obstacle tracking
+
+  int num_obstacles; //number of dynamic obstacles
 
   //a structure representing a robot inthe simulator
   struct StageRobot
@@ -356,7 +358,8 @@ int
 StageNode::SubscribeModels()
 {
   n_.setParam("/use_sim_time", true);
-  tracker_pub = n_.advertise<dynamic_obs_msgs::DynamicObstacles>(DYNAMIC_OBSTACLES, 10);
+  tracker_pub = n_.advertise<dynamic_obs_msgs::DynamicObstacles>(DYNAMIC_OBSTACLES_TOPIC, 10);
+  num_obstacles = 0;
 
   for (size_t r = 0; r < this->positionmodels.size(); r++)
   {
@@ -391,8 +394,8 @@ StageNode::SubscribeModels()
       vehicleModel->setup();
       new_robot->type_veh = true;
 
-		//For testing if odom here is same as in vehicle model
-  	  new_robot->odom_pub = n_.advertise<nav_msgs::Odometry>("stage_odom", 10);
+      //For testing if odom here is same as in vehicle model
+      new_robot->odom_pub = n_.advertise<nav_msgs::Odometry>("stage_odom", 10);
       new_robot->ground_truth_pub = n_.advertise<nav_msgs::Odometry>("stage_odom_ground_truth", 10);
 
 
@@ -400,11 +403,12 @@ StageNode::SubscribeModels()
     else
     {
       //dynamic obstacle/robot
+      num_obstacles++;
       ROS_INFO( "set normal robot model" );
       new_robot->type_veh = false;
       new_robot->cmdvel_sub = n_.subscribe<geometry_msgs::Twist>(mapName(CMD_VEL, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10, boost::bind(&StageNode::cmdvelReceived, this, r, _1));
       //TODO: take odom and ground truth out of this condition once it is not published redundantly in vehicle model
-	  new_robot->odom_pub = n_.advertise<nav_msgs::Odometry>(mapName(ODOM, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10);
+      new_robot->odom_pub = n_.advertise<nav_msgs::Odometry>(mapName(ODOM, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10);
       new_robot->ground_truth_pub = n_.advertise<nav_msgs::Odometry>(mapName(BASE_POSE_GROUND_TRUTH, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10);
 
     }
@@ -429,7 +433,7 @@ StageNode::SubscribeModels()
       }
     }
 
-   
+
 
 
     // TODO - print the topic names nicely as well
@@ -495,18 +499,18 @@ StageNode::UpdateWorld()
 void
 StageNode::updateDynamicObstacles(dynamic_obs_msgs::DynamicObstacles* obstacle_list, ros::Time sim_time)
 {
-  obstacle_list->header.frame_id = "map";
+  obstacle_list->header.frame_id = "odom";
   obstacle_list->header.stamp = sim_time;
-  obstacle_list->dyn_obs.resize(robotmodels_.size()); //resize to total number of obstacles
+  obstacle_list->dyn_obs.resize(num_obstacles); //resize to total number of obstacles
 
-  for(size_t r =0; r < this->robotmodels_.size(); ++r)
+  for(size_t r =0; r <num_obstacles; ++r) //WILL ONLY WORK IF THERE IS 1 AURO VEHICLE
   {
 
     //set necessary paramters for dynamic obstacle at index i in obstacle_list->dyn_obs
     obstacle_list->dyn_obs.at(r).volume.x = 4.8;
     obstacle_list->dyn_obs.at(r).volume.y = 2.12;
     obstacle_list->dyn_obs.at(r).volume.z = 3.00;
-    obstacle_list->dyn_obs.at(r).nbpoints = 20; //arbritary number for simulation purpsoses
+    obstacle_list->dyn_obs.at(r).nbpoints = 50; //arbritary number greater than min points for simulation purpsoses
     obstacle_list->dyn_obs.at(r).id = r;
     obstacle_list->dyn_obs.at(r).status = dynamic_obs_msgs::DynamicObstacle::STATUS_ALIVE;
 
@@ -516,9 +520,9 @@ StageNode::updateDynamicObstacles(dynamic_obs_msgs::DynamicObstacles* obstacle_l
     obstacle_list->dyn_obs.at(r).trajectories.at(0).probability = 1; //only 1 trajectory, so probability must be 1
     obstacle_list->dyn_obs.at(r).trajectories.at(0).exists_after = false; //does not become a static obstacle after obstacle completes its path
 
+
     geometry_msgs::PoseStamped temp_pose;
-    StageRobot const * robotmodel = this->robotmodels_[r];
-    Stg::Pose gpose = robotmodel->positionmodel->GetGlobalPose();
+    Stg::Pose gpose = this->robotmodels_[r+1]->positionmodel->GetGlobalPose();//MUST ADD 1 BECAUSE AURO VEHICLE IS FIRST
     tf::Quaternion q_gpose;
     q_gpose.setRPY(0.0, 0.0, gpose.a);
     tf::Transform gt(q_gpose, tf::Point(gpose.x, gpose.y, 0.0));
@@ -531,6 +535,8 @@ StageNode::updateDynamicObstacles(dynamic_obs_msgs::DynamicObstacles* obstacle_l
     temp_pose.pose.orientation.w = gt.getRotation().w();
     temp_pose.header.frame_id = obstacle_list->header.frame_id;
     temp_pose.header.stamp = sim_time;
+
+    obstacle_list->dyn_obs.at(r).trajectories.at(0).avg_orientation = temp_pose.pose.orientation; //assuming current orientation is avg orientation
     obstacle_list->dyn_obs.at(r).trajectories.at(0).points.push_back(temp_pose); //add point to time-paramterized path
 
   }
@@ -609,10 +615,10 @@ StageNode::WorldCallback()
           msg.intensities[i] = sensor.intensities[i];
         }
 
-          if (robotmodel->lasermodels.size() > 1)
-            msg.header.frame_id = mapName("base_laser_link", r, s, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh);
-          else
-            msg.header.frame_id = mapName("base_laser_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh);
+        if (robotmodel->lasermodels.size() > 1)
+          msg.header.frame_id = mapName("base_laser_link", r, s, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh);
+        else
+          msg.header.frame_id = mapName("base_laser_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh);
 
         msg.header.stamp = sim_time;
         robotmodel->laser_pubs[s].publish(msg);
@@ -639,13 +645,13 @@ StageNode::WorldCallback()
     }
 
     //the position of the robot
-if(!this->robotmodels_[r]->type_veh)
-{
-    tf.sendTransform(tf::StampedTransform(tf::Transform::getIdentity(),
-                                          sim_time,
-                                          mapName("base_footprint", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh),
-                                          mapName("base_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh)));
-}
+    if(!this->robotmodels_[r]->type_veh)
+    {
+      tf.sendTransform(tf::StampedTransform(tf::Transform::getIdentity(),
+                                            sim_time,
+                                            mapName("base_footprint", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh),
+                                            mapName("base_link", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh)));
+    }
     // Get latest odometry data
     // Translate into ROS message format and publish
     nav_msgs::Odometry odom_msg;
@@ -664,16 +670,16 @@ if(!this->robotmodels_[r]->type_veh)
     odom_msg.header.stamp = sim_time;
 
     robotmodel->odom_pub.publish(odom_msg);
-if(!this->robotmodels_[r]->type_veh)
-{
-    // broadcast odometry transform
-    tf::Quaternion odomQ;
-    tf::quaternionMsgToTF(odom_msg.pose.pose.orientation, odomQ);
-    tf::Transform txOdom(odomQ, tf::Point(odom_msg.pose.pose.position.x, odom_msg.pose.pose.position.y, 0.0));
-    tf.sendTransform(tf::StampedTransform(txOdom, sim_time,
-                                          mapName("odom", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh),
-                                          mapName("base_footprint", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh)));
-}
+    if(!this->robotmodels_[r]->type_veh)
+    {
+      // broadcast odometry transform
+      tf::Quaternion odomQ;
+      tf::quaternionMsgToTF(odom_msg.pose.pose.orientation, odomQ);
+      tf::Transform txOdom(odomQ, tf::Point(odom_msg.pose.pose.position.x, odom_msg.pose.pose.position.y, 0.0));
+      tf.sendTransform(tf::StampedTransform(txOdom, sim_time,
+                                            mapName("odom", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh),
+                                            mapName("base_footprint", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh)));
+    }
     // Also publish the ground truth pose and velocity
     Stg::Pose gpose = robotmodel->positionmodel->GetGlobalPose();
     tf::Quaternion q_gpose;
