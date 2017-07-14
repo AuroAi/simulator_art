@@ -72,8 +72,6 @@
 #define CMD_VEL "cmd_vel"
 #define DYNAMIC_OBSTACLES_TOPIC "dynamic_obstacles"
 
-geometry_msgs::PoseStamped points[200]; //global variable to keep track of time parametrized points, just for simulation purposes TODO: Correct later
-
 // Our node
 class StageNode
 {
@@ -114,6 +112,7 @@ private:
     std::vector<ros::Publisher> laser_pubs; //multiple lasers
 
     ros::Subscriber cmdvel_sub; //one cmd_vel subscriber
+    ros::Subscriber cmdpose_sub;
     bool type_veh;
   };
 
@@ -185,6 +184,8 @@ public:
 
   // Message callback for a MsgBaseVel message, which set velocities.
   void cmdvelReceived(int idx, const boost::shared_ptr<geometry_msgs::Twist const>& msg);
+
+  void cmdposeReceived(int idx, const boost::shared_ptr<geometry_msgs::Pose const>& msg);
 
   // Service callback for soft reset
   bool cb_reset_srv(std_srvs::Empty::Request& request, std_srvs::Empty::Response& response);
@@ -303,6 +304,34 @@ StageNode::cmdvelReceived(int idx, const boost::shared_ptr<geometry_msgs::Twist 
   this->base_last_cmd = this->sim_time;
 }
 
+void
+StageNode::cmdposeReceived(int idx, const boost::shared_ptr<geometry_msgs::Pose const>& msg)
+{
+  boost::mutex::scoped_lock lock(msg_lock);
+  tf::Quaternion q(msg->orientation.x,msg->orientation.y,msg->orientation.z,msg->orientation.w);
+  tf::Matrix3x3 m(q);
+  double roll, pitch, yaw;
+  m.getRPY(roll,pitch,yaw); //getting rotation about z axis (i.e. yaw) from quaternion in geometry_msgs::Pose
+  Stg::Pose newpose;
+  newpose.a = yaw;
+  /*tf::Transform gt(q, tf::Point(msg->position.x, msg->position.y, msg->position.z));
+  gt.setRotation(q);
+
+      temp_pose.pose.position.x = gt.getOrigin().x();
+      temp_pose.pose.position.y = gt.getOrigin().y();
+      temp_pose.pose.position.z = gt.getOrigin().z();
+
+  */
+
+
+  newpose.x = msg->position.x;
+  newpose.y = msg->position.y;
+  newpose.z = msg->position.z;
+  this->positionmodels[idx]->SetGlobalPose(newpose);
+  this->base_last_cmd = this->sim_time;
+}
+
+
 StageNode::StageNode(int argc, char** argv, bool gui, const char* fname, bool use_model_names)
 {
   this->use_model_names = use_model_names;
@@ -407,6 +436,7 @@ StageNode::SubscribeModels()
       ROS_INFO( "set normal robot model" );
       new_robot->type_veh = false;
       new_robot->cmdvel_sub = n_.subscribe<geometry_msgs::Twist>(mapName(CMD_VEL, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10, boost::bind(&StageNode::cmdvelReceived, this, r, _1));
+      new_robot->cmdpose_sub = n_.subscribe<geometry_msgs::Pose>(mapName("set_pose", r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10, boost::bind(&StageNode::cmdposeReceived, this, r, _1));
       //TODO: take odom and ground truth out of this condition once it is not published redundantly in vehicle model
       new_robot->odom_pub = n_.advertise<nav_msgs::Odometry>(mapName(ODOM, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10);
       new_robot->ground_truth_pub = n_.advertise<nav_msgs::Odometry>(mapName(BASE_POSE_GROUND_TRUTH, r, static_cast<Stg::Model*>(new_robot->positionmodel)), 10);
