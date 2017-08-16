@@ -1,3 +1,12 @@
+# simulation_art
+Forked from 
+https://github.com/austin-robot/utexas-art-ros-pkg/tree/master/stacks/art_vehicle/simulator_art
+
+Related source codes
+
+  *  https://github.com/ros-simulation/stage_ros
+  *  https://github.com/rtv/Stage
+
 # Dynamic Obstacle Tracking in RViz
 
 Depends on package sense/auro_dyn_obs
@@ -36,3 +45,4 @@ subscribing to the topic `/auro_dynamic_obstacle_tracking/dynamic_obstacles_filt
 and the *MarkerArray* object subscribing to the topic `/auro_dynamic_obstacle_tracking/dynamic_obstacles_filtered_text`.
 
 To see future predictions, make sure the people plugin is added to `scu_sim_launch/config/costmap.yaml`.
+
