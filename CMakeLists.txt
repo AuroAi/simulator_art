@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(simulator_art)
 # Load catkin and all dependencies required for this package
 # TODO: remove all from COMPONENTS that are not catkin packages.
-find_package(catkin REQUIRED COMPONENTS angles geometry_msgs nav_msgs roscpp roslib sensor_msgs std_msgs tf ackermann_msgs auro_vehicle_msgs dynamic_obs_msgs)
+find_package(catkin REQUIRED COMPONENTS angles geometry_msgs nav_msgs roscpp roslib sensor_msgs std_msgs tf ackermann_msgs auro_vehicle_msgs dynamic_obs_msgs auro_common_msgs)
 #find_package(PCL REQUIRED common)
 find_package(Boost REQUIRED COMPONENTS system thread)
 find_package(FLTK REQUIRED)
@@ -32,7 +32,7 @@ include_directories(
 )
 
 catkin_package(
-    DEPENDS angles geometry_msgs nav_msgs  roscpp roslib sensor_msgs std_msgs tf ackermann_msgs dynamic_obs_msgs
+    DEPENDS angles geometry_msgs nav_msgs  roscpp roslib sensor_msgs std_msgs tf ackermann_msgs dynamic_obs_msgs auro_common_msgs
     CATKIN_DEPENDS # TODO
   INCLUDE_DIRS ${Stage_INCLUDE_DIRS}
   LIBRARIES ${Stage_LIBRARIES}

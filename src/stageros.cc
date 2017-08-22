@@ -51,6 +51,8 @@
 #include <dynamic_obs_msgs/DynamicObstacle.h>
 #include <dynamic_obs_msgs/DynObsTrajectory.h>
 #include <dynamic_obs_msgs/DynamicObstacles.h>
+#include <auro_common_msgs/BoundingBox.h>
+#include <auro_common_msgs/BoundingBoxArray.h>
 
 #include <geometry_msgs/PoseStamped.h>
 #include <rosgraph_msgs/Clock.h>
@@ -71,6 +73,7 @@
 #define BASE_POSE_GROUND_TRUTH "base_pose_ground_truth"
 #define CMD_VEL "cmd_vel"
 #define DYNAMIC_OBSTACLES_TOPIC "dynamic_obstacles"
+#define BOUNDING_BOX_TOPIC "bounding_box_obstacles"
 
 // Our node
 class StageNode
@@ -90,6 +93,7 @@ private:
 
   bool vehicle_model_set;
   ros::Publisher tracker_pub; //for dynamic obstacle tracking
+  ros::Publisher bb_pub; // for bounding box of obstacles
 
   int num_obstacles; //number of dynamic obstacles
 
@@ -103,8 +107,7 @@ private:
 
     //ros publishers
     ros::Publisher odom_pub; //one odom
-    ros::Publisher ground_truth_pub; //one ground truth
-
+	ros::Publisher ground_truth_pub; //one ground truth
 
     std::vector<ros::Publisher> image_pubs; //multiple images
     std::vector<ros::Publisher> depth_pubs; //multiple depths
@@ -129,6 +132,8 @@ private:
   bool use_model_names;
 
   dynamic_obs_msgs::DynamicObstacles dynamic_obstacle_list;
+  auro_common_msgs::BoundingBox bb;
+  auro_common_msgs::BoundingBoxArray bb_list;
 
   // A helper function that is executed for each stage model.  We use it
   // to search for models of interest.
@@ -173,7 +178,7 @@ public:
   int SubscribeModels();
 
   //update information about dynamic obstacles
-  void updateDynamicObstacles(dynamic_obs_msgs::DynamicObstacles* obstacle_list, ros::Time sim_time);
+  void updateDynamicObstacles(dynamic_obs_msgs::DynamicObstacles* obstacle_list, auro_common_msgs::BoundingBoxArray* bb_list, ros::Time sim_time);
 
   // Our callback
   void WorldCallback();
@@ -388,6 +393,7 @@ StageNode::SubscribeModels()
 {
   n_.setParam("/use_sim_time", true);
   tracker_pub = n_.advertise<dynamic_obs_msgs::DynamicObstacles>(DYNAMIC_OBSTACLES_TOPIC, 10);
+  bb_pub = n_.advertise<auro_common_msgs::BoundingBoxArray>(BOUNDING_BOX_TOPIC, 10);
   num_obstacles = 0;
 
   for (size_t r = 0; r < this->positionmodels.size(); r++)
@@ -527,11 +533,15 @@ StageNode::UpdateWorld()
   return this->world->UpdateAll();
 }
 void
-StageNode::updateDynamicObstacles(dynamic_obs_msgs::DynamicObstacles* obstacle_list, ros::Time sim_time)
+StageNode::updateDynamicObstacles(dynamic_obs_msgs::DynamicObstacles* obstacle_list, auro_common_msgs::BoundingBoxArray* bb_list, ros::Time sim_time)
 {
   obstacle_list->header.frame_id = "odom";
   obstacle_list->header.stamp = sim_time;
   obstacle_list->dyn_obs.resize(num_obstacles); //resize to total number of obstacles
+
+  bb_list->header.frame_id = "odom";
+  bb_list->header.stamp = sim_time;
+  bb_list->boxes.resize(num_obstacles);
 
   for(size_t r =0; r <num_obstacles; ++r) //WILL ONLY WORK IF THERE IS 1 AURO VEHICLE
   {
@@ -542,7 +552,13 @@ StageNode::updateDynamicObstacles(dynamic_obs_msgs::DynamicObstacles* obstacle_l
     obstacle_list->dyn_obs.at(r).volume.z = 3.00;
     obstacle_list->dyn_obs.at(r).nbpoints = 50; //arbritary number greater than min points for simulation purpsoses
     obstacle_list->dyn_obs.at(r).id = r;
-    obstacle_list->dyn_obs.at(r).status = dynamic_obs_msgs::DynamicObstacle::STATUS_ALIVE;
+	obstacle_list->dyn_obs.at(r).status = dynamic_obs_msgs::DynamicObstacle::STATUS_ALIVE;
+	
+	bb_list->boxes[r].dimensions.x = 4.8;
+	bb_list->boxes[r].dimensions.y = 2.12;
+	bb_list->boxes[r].dimensions.z = 3.0;
+
+	bb_list->boxes[r].pose.position.z = bb_list->boxes[r].dimensions.z / 2.0;
 
     if(obstacle_list->dyn_obs.at(r).trajectories.size() == 0){
       obstacle_list->dyn_obs.at(r).trajectories.resize(1); //for simplification purposes, each dynamic obstacle will only have 1 trajectory associated with it
@@ -567,7 +583,15 @@ StageNode::updateDynamicObstacles(dynamic_obs_msgs::DynamicObstacles* obstacle_l
     temp_pose.header.stamp = sim_time;
 
     obstacle_list->dyn_obs.at(r).trajectories.at(0).avg_orientation = temp_pose.pose.orientation; //assuming current orientation is avg orientation
-    obstacle_list->dyn_obs.at(r).trajectories.at(0).points.push_back(temp_pose); //add point to time-paramterized path
+	obstacle_list->dyn_obs.at(r).trajectories.at(0).points.push_back(temp_pose); //add point to time-paramterized path
+	
+	bb_list->boxes[r].pose.position.x = temp_pose.pose.position.x;
+	bb_list->boxes[r].pose.position.y = temp_pose.pose.position.y;
+	bb_list->boxes[r].pose.position.z = temp_pose.pose.position.z;
+	bb_list->boxes[r].pose.orientation.x = temp_pose.pose.orientation.x;
+	bb_list->boxes[r].pose.orientation.y = temp_pose.pose.orientation.y;
+	bb_list->boxes[r].pose.orientation.z = temp_pose.pose.orientation.z;
+	bb_list->boxes[r].pose.orientation.w = temp_pose.pose.orientation.w;
 
   }
 }
@@ -916,8 +940,11 @@ StageNode::WorldCallback()
     }
   }
 
-  StageNode::updateDynamicObstacles(&dynamic_obstacle_list, sim_time);
+  dynamic_obstacle_list.dyn_obs.clear();
+  bb_list.boxes.clear();
+  StageNode::updateDynamicObstacles(&dynamic_obstacle_list, &bb_list, sim_time);
   tracker_pub.publish(dynamic_obstacle_list); //publish to dynamic_obstacle_tracking package
+  bb_pub.publish(bb_list);
 
   this->base_last_globalpos_time = this->sim_time;
   rosgraph_msgs::Clock clock_msg;
