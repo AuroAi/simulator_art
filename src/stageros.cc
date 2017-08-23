@@ -554,6 +554,8 @@ StageNode::updateDynamicObstacles(dynamic_obs_msgs::DynamicObstacles* obstacle_l
     obstacle_list->dyn_obs.at(r).id = r;
 	obstacle_list->dyn_obs.at(r).status = dynamic_obs_msgs::DynamicObstacle::STATUS_ALIVE;
 	
+	bb_list->boxes[r].header.frame_id = "odom";
+	bb_list->boxes[r].header.stamp = sim_time;
 	bb_list->boxes[r].dimensions.x = 4.8;
 	bb_list->boxes[r].dimensions.y = 2.12;
 	bb_list->boxes[r].dimensions.z = 3.0;
