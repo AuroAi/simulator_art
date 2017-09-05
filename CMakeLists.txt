@@ -38,13 +38,6 @@ catkin_package(
   LIBRARIES ${Stage_LIBRARIES}
 )
 
-# new, improved simulation
-add_executable(artstage src/artstage.cc src/vehicle_model.cc)
-target_link_libraries(artstage
-  ${catkin_LIBRARIES}
-  ${Boost_LIBRARIES}
-  ${FLTK_LIBRARIES}
-  ${Stage_LIBRARIES}  -ldl)
 
 # new, improved simulation
 add_executable(stageros src/stageros.cc src/vehicle_model.cc)
@@ -54,11 +47,3 @@ target_link_libraries(stageros
   ${FLTK_LIBRARIES}
   ${Stage_LIBRARIES}  -ldl)
   
-if(catkin_EXPORTED_TARGETS)
-  add_dependencies(artstage ${catkin_EXPORTED_TARGETS})
-endif()
-
-
-#simulator node that finds obstacles points from the SICK laser
-#add_executable(obstacles src/obstacles.cc)
-#target_link_libraries(obstacles   ${catkin_LIBRARIES} ${PCL_LIBRARIES})
