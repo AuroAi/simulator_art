@@ -722,7 +722,7 @@ StageNode::WorldCallback()
     //@todo Publish stall on a separate topic when one becomes available
     //this->odomMsgs[r].stall = this->positionmodels[r]->Stall();
     //
-    odom_msg.header.frame_id = mapName("odom", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh);
+    odom_msg.header.frame_id = "odom";
     odom_msg.header.stamp = sim_time;
 
     robotmodel->odom_pub.publish(odom_msg);
@@ -733,7 +733,7 @@ StageNode::WorldCallback()
       tf::quaternionMsgToTF(odom_msg.pose.pose.orientation, odomQ);
       tf::Transform txOdom(odomQ, tf::Point(odom_msg.pose.pose.position.x, odom_msg.pose.pose.position.y, 0.0));
       tf.sendTransform(tf::StampedTransform(txOdom, sim_time,
-                                            mapName("odom", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh),
+                                            "odom",
                                             mapName("base_footprint", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh)));
     }
     // Also publish the ground truth pose and velocity
@@ -770,7 +770,7 @@ StageNode::WorldCallback()
     ground_truth_msg.twist.twist.linear.z = gvel.z;
     ground_truth_msg.twist.twist.angular.z = gvel.a;
 
-    ground_truth_msg.header.frame_id = mapName("odom", r, static_cast<Stg::Model*>(robotmodel->positionmodel),this->robotmodels_[r]->type_veh);
+    ground_truth_msg.header.frame_id = "odom";
     ground_truth_msg.header.stamp = sim_time;
 
 

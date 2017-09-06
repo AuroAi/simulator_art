@@ -44,12 +44,11 @@ window
 
 map
 (
-  gui_grid 0
   bitmap "scu.png"
-  size [ 552.000 419.000 0.500 ]
-  name "scu2"
-  obstacle_return 0
-  laser_return 0
+  size [ 552.000 419.000 2.500 ]
+  name "scu"
+  obstacle_return 1
+  laser_return 1
 )
 
 

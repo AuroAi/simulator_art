@@ -3,62 +3,33 @@
   <param name="use_sim_time" value="true"/>
   <arg name="cmd_mode_ackermann" default="true" />
   <arg name="config_file" default="$(find simulator_art)/config/vehicle_model.yaml"/>
+  
+  <!-- Rviz -->
+  <arg name="rviz" default="true" />
+  <arg name="rviz_file" default="$(find simulator_art)/rviz/sim.rviz" />
 
   <rosparam command="load" file="$(arg config_file)" ns="artstage"/>
 	
   <!-- stage simulator for vehicle -->
   <!-- launch-prefix="xterm -e gdb - -args" -->
-  <node pkg="simulator_art" type="stageros" name="stageros" args="-u $(find simulator_art)/stage_worlds/$(optenv WORLD scu).world" output="screen"  >
-    <rosparam file="$(find scu_data)/stage_worlds/$(optenv WORLD scu).yaml"/>
+  <node pkg="simulator_art" type="stageros" name="stageros" args="-u $(find simulator_art)/stage_worlds/scu.world" output="screen"  >
+    <rosparam file="$(find simulator_art)/stage_worlds/scu.yaml"/>
     <param name="cmd_mode_ackermann" value="$(arg cmd_mode_ackermann)"/>
     <param name="broadcast_utm_odom" value="true"/>
     <param name="delay_location_steps" value="16"/>
   </node>
-
-  <!--<node pkg="simulator_art" type="obstacles" name="art_simulated_obstacles" />-->
-
-  <node pkg="tf2_ros" type="static_transform_publisher" name="front_sick" args="3.1779999733 0.0 0.699999988079 0.0 0.0 0.0134995902914 0.999908876379 base_link front_sick"/>
-
+  
   <!-- teleop keyboard-->
   <include file="$(find ackermann_drive_teleop)/launch/ackermann_drive_keyop.launch"  >
-    <arg name="command_topic" value="/veh_auro/ackermann_cmd"/>
+    <arg name="command_topic" value="/ackermann_cmd"/>
     <arg name="max_speed" value="4.5"/>
     <arg name="max_angle" value="0.7"/>
     <arg name="xterm" value="true"/>
   </include>
-   <!--
-   <node pkg ="obstacle_controller" type="back_and_forth_obstacle.py" name="backforth_ped_one">
-	   <remap from="/cmd_vel" to="/ped_one/cmd_vel" />
-  </node>
-  -->
-  <node pkg ="obstacle_controller" type="back_and_forth_obstacle.py" name="backforth">
-	  <param name="vel_topic_path" type="str" value="/obs_car/cmd_vel"/>
-	  <param name="speed" type="double" value="10"/>
-	  <param name="distance" type="int" value="500"/>
-	  <param name="xdir" type="int" value="1"/>
-	  <param name="ydir" type="int" value="1"/>
-  </node>
-  
-  <node pkg ="obstacle_controller" type="back_and_forth_obstacle.py" name="backforth1">
-	  <param name="vel_topic_path" type="str" value="/obs_car1/cmd_vel"/>
-	  <param name="speed" type="double" value="20"/>
-	  <param name="distance" type="int" value="500"/>
-	  <param name="xdir" type="int" value="1"/>
-	  <param name="ydir" type="int" value="1"/>
-  </node>
-  
-   <!-- 
-  <node pkg ="obstacle_controller" type="back_and_forth_obstacle.py" name="backforth1">
-	  <remap from="/cmd_vel" to="/obs_car1/cmd_vel"/>
-  </node>
 
-  <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop_twist_keyboard1"  launch-prefix="xterm -e" >
-	<remap from="/cmd_vel" to="/obs_car/cmd_vel" />
-  </node>
- 
-    <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop_twist_keyboard2" launch-prefix="xterm" >
-	  <remap from="cmd_vel" to="obs_car2/cmd_vel" />
-  </node>
--->
+  <!-- rviz visualization-->
+  <param name="robot_description" textfile="$(find simulator_art)/rviz/vehicle.urdf"/>
+  <node pkg="rviz" type="rviz" name="$(anon rviz)" args="-d $(arg rviz_file)" output="screen" if="$(arg rviz)"/>
+  
 </launch>
 
