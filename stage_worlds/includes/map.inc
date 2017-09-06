@@ -5,7 +5,7 @@ define map model
   color "black"
 
   # most maps will need a bounding box
-  boundary 0
+  boundary 1
 
   gui_nose 0
   gui_grid 0
