@@ -1,0 +1,14 @@
+image: ubuntu:xenial
+
+services:
+  - docker:dind
+
+stages:
+  - build
+
+build_bb1:
+  stage: build
+  script:
+  - 'which curl || ( apt update -y && apt install curl -y )'
+  - curl --request POST --form "token=$CI_JOB_TOKEN" --form ref=master https://gitlab.auro.ai/api/v4/projects/125/trigger/pipeline
+  
